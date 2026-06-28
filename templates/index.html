@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskMate – Risk Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #2c5282;
+            --accent: #0e9f6e;
+            --accent-dark: #0c7a55;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --success: #38a169;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.15), 0 4px 10px -2px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.85rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
+        .logo-icon { font-size: 1.9rem; color: var(--accent); }
+        .logo-text { font-size: 1.45rem; font-weight: 700; }
+        .nav-actions { display: flex; gap: 0.9rem; align-items: center; }
+
+        .btn-nav-outline {
+            padding: 0.6rem 1.3rem;
+            border-radius: var(--border-radius);
+            background: transparent;
+            color: white;
+            border: 1.5px solid rgba(255,255,255,0.55);
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        .btn-nav-outline:hover { background: rgba(255,255,255,0.12); border-color: white; }
+
+        .btn-nav-accent {
+            padding: 0.6rem 1.3rem;
+            border-radius: var(--border-radius);
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        .btn-nav-accent:hover { background-color: var(--accent-dark); transform: translateY(-1px); }
+
+        /* HERO */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 60%, #1a4a7a 100%);
+            color: white;
+            padding: 5rem 2rem 4.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 420px; height: 420px; border-radius: 50%;
+            background: rgba(14,159,110,0.13); pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: -80px; left: -40px;
+            width: 320px; height: 320px; border-radius: 50%;
+            background: rgba(255,255,255,0.04); pointer-events: none;
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 40px 40px; pointer-events: none;
+        }
+        .hero-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 3.5rem; align-items: center;
+            position: relative; z-index: 1;
+        }
+        .hero-title {
+            font-size: 2.9rem; font-weight: 700; line-height: 1.2; margin-bottom: 1.1rem;
+        }
+        .hero-title span { color: #6ee7c0; }
+        .hero-subtitle {
+            font-size: 1.1rem; color: rgba(255,255,255,0.75);
+            line-height: 1.7; margin-bottom: 2rem; max-width: 480px;
+        }
+        .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+        .btn-primary-lg {
+            background-color: var(--accent); color: white;
+            padding: 0.85rem 2rem; font-size: 1rem;
+            border-radius: 8px; border: none; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 18px rgba(14,159,110,0.35);
+        }
+        .btn-primary-lg:hover { background-color: var(--accent-dark); transform: translateY(-2px); }
+
+        .btn-secondary-lg {
+            background-color: rgba(255,255,255,0.1); color: white;
+            padding: 0.85rem 2rem; font-size: 1rem;
+            border-radius: 8px; border: 1.5px solid rgba(255,255,255,0.4);
+            font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            transition: var(--transition); text-decoration: none;
+        }
+        .btn-secondary-lg:hover { background-color: rgba(255,255,255,0.18); border-color: white; }
+
+        /* Dashboard Preview */
+        .hero-visual { position: relative; }
+        .dashboard-preview {
+            background: white; border-radius: 12px;
+            box-shadow: 0 22px 65px rgba(0,0,0,0.38); overflow: hidden;
+            transform: perspective(800px) rotateY(-6deg) rotateX(3deg);
+            transition: transform 0.4s ease;
+        }
+        .dashboard-preview:hover { transform: perspective(800px) rotateY(-2deg) rotateX(1deg); }
+
+        .preview-bar {
+            background: var(--primary); padding: 0.65rem 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .preview-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .preview-dot.red { background: #ef4444; }
+        .preview-dot.yellow { background: #f59e0b; }
+        .preview-dot.green { background: #10b981; }
+        .preview-title { color: rgba(255,255,255,0.6); font-size: 0.75rem; margin-left: 0.5rem; }
+
+        .preview-body { padding: 1rem; background: #f0f4f8; }
+        .preview-kpis {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem; margin-bottom: 0.8rem;
+        }
+        .preview-kpi {
+            background: white; border-radius: 6px; padding: 0.65rem; border-top: 3px solid;
+        }
+        .preview-kpi:nth-child(1) { border-color: var(--info); }
+        .preview-kpi:nth-child(2) { border-color: var(--danger); }
+        .preview-kpi:nth-child(3) { border-color: var(--warning); }
+        .preview-kpi:nth-child(4) { border-color: var(--success); }
+        .preview-kpi-val { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+        .preview-kpi-lbl { font-size: 0.6rem; color: #64748b; margin-top: 2px; }
+
+        .preview-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .preview-chart { background: white; border-radius: 6px; padding: 0.65rem; height: 90px; }
+        .preview-chart-title { font-size: 0.6rem; font-weight: 600; color: var(--primary); margin-bottom: 0.4rem; }
+
+        .mini-heatmap { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+        .mini-cell { height: 16px; border-radius: 2px; }
+        .mini-cell.critical { background: #e53e3e; }
+        .mini-cell.high { background: #dd6b20; }
+        .mini-cell.medium { background: #d69e2e; }
+        .mini-cell.low { background: #38a169; }
+
+        .mini-bar-chart { display: flex; align-items: flex-end; gap: 3px; height: 55px; }
+        .mini-bar { flex: 1; border-radius: 2px 2px 0 0; }
+        .mini-bar.b1 { background: var(--danger); height: 80%; }
+        .mini-bar.b2 { background: var(--warning); height: 60%; }
+        .mini-bar.b3 { background: #d69e2e; height: 45%; }
+        .mini-bar.b4 { background: var(--success); height: 30%; }
+        .mini-bar.b5 { background: var(--info); height: 50%; }
+
+        .float-badge {
+            position: absolute; background: white; border-radius: 10px;
+            padding: 0.55rem 0.9rem; box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+            display: flex; align-items: center; gap: 0.5rem;
+            font-size: 0.78rem; font-weight: 600; color: var(--dark);
+        }
+        .float-badge.top-right { top: -14px; right: -18px; animation: floatY 3s ease-in-out infinite; }
+        .float-badge.bottom-left { bottom: -14px; left: -18px; animation: floatY 3s ease-in-out infinite 1.5s; }
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+
+        /* SHARED SECTION STYLES */
+        .section { padding: 4.5rem 2rem; }
+        .section-inner { max-width: 1200px; margin: 0 auto; }
+        .section-label {
+            text-align: center; color: var(--accent); font-weight: 700;
+            font-size: 0.82rem; text-transform: uppercase;
+            letter-spacing: 0.09em; margin-bottom: 0.5rem;
+        }
+        .section-title {
+            text-align: center; font-size: 2rem; font-weight: 700;
+            color: var(--primary); margin-bottom: 0.6rem;
+        }
+        .section-subtitle {
+            text-align: center; color: #64748b; font-size: 1rem;
+            max-width: 580px; margin: 0 auto 3rem; line-height: 1.7;
+        }
+
+        /* KEY FEATURES */
+        .features-section { background: white; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-item {
+            border: 1px solid #e2e8f0; border-radius: var(--border-radius);
+            padding: 1.8rem; transition: var(--transition);
+            position: relative; overflow: hidden; background: #fafbfd;
+        }
+        .feature-item::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 4px; height: 100%; background: var(--accent);
+            transform: scaleY(0); transform-origin: bottom; transition: transform 0.3s ease;
+        }
+        .feature-item:hover::before { transform: scaleY(1); }
+        .feature-item:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); transform: translateY(-3px); background: white; }
+
+        .feature-icon {
+            width: 52px; height: 52px; background: rgba(14,159,110,0.1);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 1.2rem; font-size: 1.4rem; color: var(--accent);
+            transition: var(--transition);
+        }
+        .feature-item:hover .feature-icon { background: var(--accent); color: white; }
+        .feature-title { font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; font-size: 1.02rem; }
+        .feature-desc { color: #64748b; font-size: 0.9rem; line-height: 1.6; }
+
+        /* LEARN MORE / GUIDE */
+        .guide-section { background: #f0f4f8; }
+        .guidelines-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .guideline-card {
+            background: white; padding: 1.8rem; border-radius: var(--border-radius);
+            box-shadow: var(--shadow); transition: var(--transition);
+            border-left: 4px solid var(--accent);
+            display: flex; flex-direction: column; gap: 0.8rem;
+        }
+        .guideline-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .guideline-header { display: flex; align-items: center; gap: 0.9rem; }
+        .guideline-icon {
+            width: 46px; height: 46px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .guideline-step {
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--accent); margin-bottom: 0.15rem;
+        }
+        .guideline-title { font-size: 1rem; font-weight: 700; color: var(--primary); }
+        .guideline-desc { color: #64748b; font-size: 0.9rem; line-height: 1.6; }
+
+
+        /* FOOTER */
+        .footer { background: var(--dark); color: rgba(255,255,255,0.6); padding: 1.8rem 2rem; }
+        .footer-content {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 1rem;
+        }
+        .footer-logo { display: flex; align-items: center; gap: 0.6rem; color: white; font-weight: 700; font-size: 1.05rem; }
+        .footer-logo i { color: var(--accent); font-size: 1.2rem; }
+        .footer-links { display: flex; gap: 1.5rem; }
+        .footer-links a { color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+        .footer-links a:hover { color: white; }
+        .footer-copy { font-size: 0.82rem; }
+
+        /* LOGIN MODAL */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(10,26,47,0.65);
+            z-index: 999; display: none;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(3px);
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white; border-radius: 14px;
+            width: 100%; max-width: 420px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.25); overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            background: var(--primary); color: white;
+            padding: 1.5rem 1.8rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header-left { display: flex; align-items: center; gap: 0.8rem; }
+        .modal-header-left .mh-icon { color: var(--accent); font-size: 1.4rem; }
+        .modal-header h3 { font-size: 1.15rem; font-weight: 700; }
+        .modal-header p { font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.2rem; }
+        .modal-close {
+            background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.75);
+            font-size: 1rem; cursor: pointer; transition: var(--transition);
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { color: white; background: rgba(255,255,255,0.2); }
+
+        .modal-body { padding: 2rem 1.8rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 0.4rem; }
+        .input-wrap { position: relative; }
+        .input-wrap .input-icon {
+            position: absolute; left: 0.9rem; top: 50%;
+            transform: translateY(-50%); color: #94a3b8; font-size: 0.9rem;
+        }
+        .form-input {
+            width: 100%; padding: 0.72rem 0.9rem 0.72rem 2.5rem;
+            border: 1.5px solid #e2e8f0; border-radius: 7px;
+            font-size: 0.95rem; font-family: inherit; transition: var(--transition);
+            outline: none; color: var(--dark); background: #f8fafc;
+        }
+        .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(14,159,110,0.12); background: white; }
+
+        .btn-modal-login {
+            width: 100%; background: var(--primary); color: white;
+            padding: 0.82rem; border: none; border-radius: 7px;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .btn-modal-login:hover { background: var(--secondary); }
+
+        .modal-footer-note {
+            text-align: center; margin-top: 1.2rem;
+            font-size: 0.82rem; color: #94a3b8;
+        }
+        .alert-error {
+            background: #fef2f2; border: 1px solid #fecaca; color: #dc2626;
+            padding: 0.7rem 1rem; border-radius: 7px; font-size: 0.88rem;
+            margin-bottom: 1rem; display: none; align-items: center; gap: 0.5rem;
+        }
+
+        /* ANIMATIONS */
+        .fade-up { opacity: 0; transform: translateY(22px); animation: fadeUp 0.65s ease forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .d1 { animation-delay: 0.05s; }
+        .d2 { animation-delay: 0.18s; }
+        .d3 { animation-delay: 0.3s; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; }
+            .hero-visual { display: none; }
+            .hero-title { font-size: 2.1rem; }
+        }
+        @media (max-width: 600px) {
+            .navbar { padding: 0.8rem 1.2rem; }
+            .hero { padding: 3.5rem 1.2rem 3rem; }
+            .section { padding: 3rem 1.2rem; }
+            .footer-content { flex-direction: column; text-align: center; }
+            .footer-links { flex-wrap: wrap; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-shield-alt logo-icon"></i>
+        <span class="logo-text">RiskMate</span>
+    </div>
+    <div class="nav-actions">
+        <button class="btn-nav-outline" onclick="openLogin()">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        <button class="btn-nav-accent" onclick="window.location.href='/signup'">
+    <i class="fas fa-user-plus"></i> Sign Up
+</button>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+
+        <div class="hero-content">
+            <h1 class="hero-title fade-up d1">
+                Smarter <span>Cyber Risk</span><br>Assessment, Simplified
+            </h1>
+            <p class="hero-subtitle fade-up d2">
+                Identify, analyze, and respond to all types of risks in an organized manner.
+                Our innovative system helps keep your organization secure and protected from potential threats.
+            </p>
+            <div class="hero-cta fade-up d3">
+                <button class="btn-primary-lg" onclick="openLogin()">
+                    <i class="fas fa-play-circle"></i> Get Started
+                </button>
+                <a href="#learn-more" class="btn-secondary-lg">
+                    <i class="fas fa-book-open"></i> Learn More
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div style="position:relative;">
+                <div class="dashboard-preview">
+                    <div class="preview-bar">
+                        <div class="preview-dot red"></div>
+                        <div class="preview-dot yellow"></div>
+                        <div class="preview-dot green"></div>
+                        <span class="preview-title">RiskMate Dashboard</span>
+                    </div>
+                    <div class="preview-body">
+                        <div class="preview-kpis">
+                            <div class="preview-kpi">
+                                <div class="preview-kpi-val">24</div>
+                                <div class="preview-kpi-lbl">Total Assets</div>
+                            </div>
+                            <div class="preview-kpi">
+                                <div class="preview-kpi-val">7</div>
+                                <div class="preview-kpi-lbl">Critical Risks</div>
+                            </div>
+                            <div class="preview-kpi">
+                                <div class="preview-kpi-val">13</div>
+                                <div class="preview-kpi-lbl">High Risks</div>
+                            </div>
+                            <div class="preview-kpi">
+                                <div class="preview-kpi-val">5</div>
+                                <div class="preview-kpi-lbl">Mitigations</div>
+                            </div>
+                        </div>
+                        <div class="preview-charts">
+                            <div class="preview-chart">
+                                <div class="preview-chart-title">Risk Heatmap</div>
+                                <div class="mini-heatmap">
+                                    <div class="mini-cell critical"></div>
+                                    <div class="mini-cell critical"></div>
+                                    <div class="mini-cell high"></div>
+                                    <div class="mini-cell high"></div>
+                                    <div class="mini-cell medium"></div>
+                                    <div class="mini-cell medium"></div>
+                                    <div class="mini-cell medium"></div>
+                                    <div class="mini-cell low"></div>
+                                    <div class="mini-cell low"></div>
+                                </div>
+                            </div>
+                            <div class="preview-chart">
+                                <div class="preview-chart-title">Risk by Severity</div>
+                                <div class="mini-bar-chart">
+                                    <div class="mini-bar b1"></div>
+                                    <div class="mini-bar b2"></div>
+                                    <div class="mini-bar b3"></div>
+                                    <div class="mini-bar b4"></div>
+                                    <div class="mini-bar b5"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- KEY FEATURES -->
+<section class="section features-section" id="features">
+    <div class="section-inner">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-subtitle">A complete risk management toolkit built for security professionals and organizations of all sizes.</p>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-boxes"></i></div>
+                <div class="feature-title">Asset Management</div>
+                <div class="feature-desc">Keep a complete record of all critical assets and track them efficiently across your organization.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="feature-title">Risk Assessment</div>
+                <div class="feature-desc">Analyze and identify risks using modern methodologies and frameworks including NIST and ISO 27005.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="feature-title">Reporting & Analytics</div>
+                <div class="feature-desc">Generate detailed reports and gain comprehensive analytical insights with real-time dashboards.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="feature-title">Response Planning</div>
+                <div class="feature-desc">Create comprehensive plans to mitigate and manage identified risks with defined treatment strategies.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-users-cog"></i></div>
+                <div class="feature-title">User Management</div>
+                <div class="feature-desc">Organize different users and assign appropriate permissions and roles for each team member.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon"><i class="fas fa-clipboard-check"></i></div>
+                <div class="feature-title">Compliance Tracking</div>
+                <div class="feature-desc">Stay compliant with ISO standards and other regulatory requirements through automated tracking.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- LEARN MORE / HOW TO USE -->
+<section class="section guide-section" id="learn-more">
+    <div class="section-inner">
+        <h2 class="section-title">How to Use Our System</h2>
+        <p class="section-subtitle">
+            Our Risk Management System is easy to use. Here you will find guidance for every step
+            of the process to help you manage risks effectively.
+        </p>
+
+        <div class="guidelines-grid">
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">Asset Inventory</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">Start by creating a list of all your critical assets. Include software, hardware, data, and people in your inventory.</div>
+            </div>
+
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-search"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">Risk Assessment</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">Identify potential risks for each asset. Evaluate their probability and impact levels accurately.</div>
+            </div>
+
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">Risk Analysis</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">Conduct detailed analysis of identified risks. Prioritize them and focus on the most critical ones.</div>
+            </div>
+
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">Risk Response</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">Develop an action plan for each risk. Create mitigation strategies to reduce or eliminate risks.</div>
+            </div>
+
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-users"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">User Management</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">Add users with different roles and responsibilities. Assign appropriate permissions for each user level.</div>
+            </div>
+
+            <div class="guideline-card">
+                <div class="guideline-header">
+                    <div class="guideline-icon"><i class="fas fa-file-alt"></i></div>
+                    <div>
+                    
+                        <div class="guideline-title">Reporting</div>
+                    </div>
+                </div>
+                <div class="guideline-desc">View detailed reports and dashboards. Track your progress and measure risk reduction efforts.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- FOOTER -->
+<footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                Automated Risk Analysis Framework (NIST 800-30 / ISO 27005)
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About This Project</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="footer-copyright">
+                © 2025 CyberRisk Analytics Institute
+            </div>
+        </div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <i class="fas fa-shield-alt mh-icon"></i>
+                <div>
+                    <h3>RiskMate Login</h3>
+                    <p>Sign in to access your dashboard</p>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeLogin()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="alert-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMsg">Invalid username or password.</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <div class="input-wrap">
+                    <i class="fas fa-user input-icon"></i>
+                    <input type="text" class="form-input" id="loginUsername" placeholder="e.g. Admin_01" autocomplete="username">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrap">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+                </div>
+            </div>
+            <button class="btn-modal-login" onclick="handleLogin()">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+            <div class="modal-footer-note">
+    <i class="fas fa-info-circle"></i> New user? 
+    <a href="/signup" style="color: #0e9f6e; text-decoration: none; font-weight: 600;">Create an account</a>
+</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openLogin() {
+        document.getElementById('loginModal').classList.add('show');
+        document.getElementById('loginError').style.display = 'none';
+        setTimeout(() => document.getElementById('loginUsername').focus(), 120);
+    }
+
+    function closeLogin() {
+        document.getElementById('loginModal').classList.remove('show');
+        document.getElementById('loginError').style.display = 'none';
+        document.getElementById('loginUsername').value = '';
+        document.getElementById('loginPassword').value = '';
+    }
+
+    async function handleLogin() {
+        const username = document.getElementById('loginUsername').value.trim(); 
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const errorMsg = document.getElementById('errorMsg');
+
+    if (!username || !password) {
+        errorMsg.textContent = 'Please enter both username and password.';
+        errorEl.style.display = 'flex';
+        return;
+    }
+
+    errorEl.style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username: username, password: password })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            window.location.href = data.redirect || '/dashboard';
+        } else {
+            errorMsg.textContent = data.error || 'Invalid username or password.';
+            errorEl.style.display = 'flex';
+        }
+    } catch (error) {
+        errorMsg.textContent = 'Network error. Please try again.';
+        errorEl.style.display = 'flex';
+    }
+      
+}
+
+    document.getElementById('loginModal').addEventListener('click', function(e) {
+        if (e.target === this) closeLogin();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('show')) handleLogin();
+        if (e.key === 'Escape') closeLogin();
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', function(e) {
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Register | NIST Risk Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #2c5282;
+            --accent: #0e9f6e;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --success: #38a169;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { background-color: #f0f4f8; color: var(--dark); min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* NAVBAR */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 70px;
+        }
+        .logo { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 0; }
+        .logo-icon { font-size: 1.8rem; color: var(--accent); }
+        .logo-text { font-size: 1.2rem; font-weight: 600; white-space: nowrap; }
+        .nav-links { display: flex; gap: 0.2rem; align-items: center; }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 0.25rem; cursor: pointer; padding: 0.5rem 0.85rem; border-radius: var(--border-radius);
+            transition: var(--transition); color: rgba(255,255,255,0.85); text-decoration: none;
+        }
+        .nav-item:hover { background-color: rgba(255,255,255,0.12); color: white; }
+        .nav-item.active { background-color: rgba(255,255,255,0.18); color: white; }
+        .nav-item i { font-size: 1.25rem; }
+        .nav-item span { font-size: 0.75rem; white-space: nowrap; text-align: center; }
+        .user-section { display: flex; align-items: center; gap: 1rem; }
+        .user-info { text-align: right; }
+        .user-name { font-weight: 600; font-size: 0.95rem; }
+        .user-role { font-size: 0.8rem; opacity: 0.9; color: var(--accent); }
+        .user-profile { position: relative; cursor: pointer; }
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.1rem; border: 2px solid white; transition: var(--transition);
+        }
+        .avatar:hover { transform: scale(1.1); }
+        .profile-dropdown {
+            position: absolute; top: 120%; right: 0; background-color: white;
+            border-radius: var(--border-radius); box-shadow: var(--shadow);
+            width: 220px; overflow: hidden; display: none; z-index: 1000;
+        }
+        .profile-dropdown.show { display: block; }
+        .dropdown-header { padding: 1rem; background-color: #f8fafc; border-bottom: 1px solid var(--gray); }
+        .dropdown-user-name { font-weight: 600; color: var(--primary); }
+        .dropdown-user-role { font-size: 0.85rem; color: #64748b; }
+        .dropdown-item {
+            padding: 0.8rem 1rem; color: var(--dark); display: flex; align-items: center;
+            gap: 0.8rem; transition: var(--transition); cursor: pointer; border-bottom: 1px solid #f1f5f9;
+        }
+        .dropdown-item:last-child { border-bottom: none; }
+        .dropdown-item:hover { background-color: #f1f5f9; }
+        .dropdown-item.danger:hover { background-color: #fee2e2; }
+        .dropdown-item i { width: 20px; text-align: center; color: var(--secondary); }
+        .dropdown-item.danger i { color: var(--danger); }
+
+        /* CONTAINER */
+        .container { flex: 1; padding: 1.5rem 2rem; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .page-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .page-title { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin: 0 0 5px 0; }
+        .page-description { color: #64748b; margin: 0; font-size: 1rem; }
+        .action-buttons { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+        /* BUTTONS */
+        .btn {
+            padding: 0.7rem 1.2rem; border-radius: var(--border-radius); border: none;
+            font-weight: 600; cursor: pointer; display: inline-flex; align-items: center;
+            gap: 0.6rem; transition: var(--transition); font-size: 0.9rem;
+        }
+        .btn i { font-size: 1rem; }
+        .btn-secondary { background-color: white; color: var(--primary); border: 1px solid var(--gray); }
+        .btn-secondary:hover { background-color: #f8fafc; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: #c53030; }
+        .btn-icon {
+            background: none; border: none; color: var(--danger); font-size: 16px;
+            cursor: pointer; padding: 8px; border-radius: 6px; transition: var(--transition);
+            width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { background-color: #fee2e2; color: #b91c1c; transform: scale(1.1); }
+
+        /* FILTERS */
+        .filters-container {
+            background: white; padding: 1.2rem; border-radius: var(--border-radius);
+            box-shadow: var(--shadow); margin-bottom: 1.5rem;
+            display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+        }
+        .search-box { position: relative; flex: 1; min-width: 250px; }
+        .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; }
+        .search-input { width: 100%; padding: 0.7rem 1rem 0.7rem 2.8rem; border: 1px solid var(--gray); border-radius: var(--border-radius); font-size: 0.95rem; outline: none; }
+        .search-input:focus { border-color: var(--secondary); }
+        .filter-group { display: flex; align-items: center; gap: 0.5rem; }
+        .filter-label { font-size: 0.9rem; color: #64748b; font-weight: 600; white-space: nowrap; }
+        .filter-select { padding: 0.7rem; border: 1px solid var(--gray); border-radius: var(--border-radius); background-color: white; font-size: 0.9rem; cursor: pointer; outline: none; min-width: 120px; }
+        .filter-select:hover { border-color: var(--primary); }
+
+        /* TABLE */
+        .table-container { background: white; border-radius: var(--border-radius); box-shadow: var(--shadow); overflow-x: auto; }
+        .table-header { padding: 1rem 1.5rem; background: #f8fafc; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .table-title { font-size: 1.1rem; font-weight: 600; color: var(--primary); margin: 0; }
+        .table-summary { color: #6c757d; font-size: 0.9rem; }
+        .asset-table { width: 100%; border-collapse: collapse; background: white; }
+        .asset-table th { background: linear-gradient(135deg, #1a3a5f 0%, #2c5282 100%); color: white; font-weight: 600; padding: 12px 15px; text-align: left; font-size: 0.85rem; letter-spacing: 0.3px; }
+        .asset-table td { padding: 12px 15px; border-bottom: 1px solid #e9ecef; font-size: 0.95rem; }
+        .asset-table tbody tr:last-child td { border-bottom: none; }
+        .risk-row { cursor: pointer; transition: background-color 0.2s; }
+        .risk-row:hover { background-color: #f1f5f9; }
+        .risk-row td:last-child { cursor: default; }
+        .table-empty { padding: 50px; text-align: center; color: #6c757d; display: none; flex-direction: column; align-items: center; gap: 10px; }
+        .table-empty i { font-size: 48px; color: #dee2e6; }
+
+        /* RISK BADGES */
+        .risk-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-align: center; min-width: 80px; letter-spacing: 0.3px; }
+        .level-critical { background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%); color: white; box-shadow: 0 2px 8px rgba(198,40,40,0.3); }
+        .level-very-high { background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%); color: white; box-shadow: 0 2px 8px rgba(211,47,47,0.3); }
+        .level-high { background: linear-gradient(135deg, #ef6c00 0%, #e65100 100%); color: white; box-shadow: 0 2px 8px rgba(239,108,0,0.3); }
+        .level-medium { background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%); color: white; box-shadow: 0 2px 8px rgba(245,124,0,0.3); }
+        .level-low { background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%); color: white; box-shadow: 0 2px 8px rgba(46,125,50,0.3); }
+        .level-unknown { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; }
+
+        /* ============================================ */
+        /* RISK DETAIL MODAL — matches site modal style */
+        /* ============================================ */
+        #riskDetailModal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        #riskDetailModal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #riskDetailModal .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 1100px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        #riskDetailModal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        #riskDetailModal .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        #riskDetailModal .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0;
+        }
+
+        #riskDetailModal .modal-title i {
+            color: var(--accent);
+            font-size: 1.3rem;
+        }
+
+        #riskDetailModal .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: var(--transition);
+            line-height: 1;
+            padding: 0.2rem 0.4rem;
+        }
+
+        #riskDetailModal .modal-close:hover {
+            color: var(--danger);
+        }
+
+        #riskDetailModal .modal-body {
+            padding: 1.5rem;
+            background: #f8fafc;
+        }
+
+        #riskDetailModal .modal-footer {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        /* MODAL INNER CONTENT SECTIONS */
+        .loading-spinner { text-align: center; padding: 50px; color: var(--primary); }
+        .loading-spinner i { font-size: 48px; margin-bottom: 20px; color: var(--accent); }
+        .loading-spinner p { font-size: 16px; color: #64748b; }
+        .error-message { text-align: center; padding: 50px; color: var(--danger); }
+        .error-message i { font-size: 48px; margin-bottom: 20px; }
+        .error-message p { font-size: 16px; margin-bottom: 20px; }
+
+        .risk-detail-section {
+            background: white; border-radius: var(--border-radius); padding: 1.2rem;
+            margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e9ecef;
+        }
+        .risk-detail-section:last-child { margin-bottom: 0; }
+        .risk-detail-section h4 {
+            margin: 0 0 12px 0; color: var(--primary); font-size: 1rem; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+            padding-bottom: 10px; border-bottom: 1px solid #e9ecef;
+        }
+        .risk-detail-section h4 i { color: var(--accent); font-size: 1rem; }
+
+        .detail-table { width: 100%; border-collapse: collapse; }
+        .detail-table tr { border-bottom: 1px solid #f1f3f5; }
+        .detail-table tr:last-child { border-bottom: none; }
+        .detail-table th { text-align: left; padding: 9px 12px; background-color: #f8f9fa; font-weight: 600; color: #495057; font-size: 0.82rem; width: 15%; text-transform: uppercase; letter-spacing: 0.3px; }
+        .detail-table td { padding: 9px 12px; color: #212529; font-size: 0.92rem; }
+
+        .cia-badge { display: inline-block; width: 32px; height: 32px; line-height: 32px; text-align: center; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); color: #1565c0; border-radius: 8px; font-weight: 700; font-size: 14px; }
+
+        .cve-list, .threat-list { margin: 5px 0; padding-left: 0; list-style-type: none; }
+        .cve-list li, .threat-list li { margin-bottom: 6px; padding: 6px 10px; background-color: #f8f9fa; border-radius: 6px; border-left: 3px solid #dee2e6; }
+        .cve-list li.cve-critical { border-left-color: #c62828; background-color: #ffebee; }
+        .cve-list li.cve-high     { border-left-color: #ef6c00; background-color: #fff3e0; }
+        .cve-list li.cve-medium   { border-left-color: #f57c00; background-color: #fff8e1; }
+        .cve-list li.cve-low      { border-left-color: #2e7d32; background-color: #e8f5e9; }
+
+        .effectiveness-strong { color: #2e7d32; font-weight: 600; background-color: #e8f5e9; padding: 2px 8px; border-radius: 12px; display: inline-block; }
+        .effectiveness-medium { color: #ef6c00; font-weight: 600; background-color: #fff3e0; padding: 2px 8px; border-radius: 12px; display: inline-block; }
+        .effectiveness-weak   { color: #c62828; font-weight: 600; background-color: #ffebee; padding: 2px 8px; border-radius: 12px; display: inline-block; }
+
+        .strategy-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .strategy-mitigate { background-color: #e8f5e9; color: #2e7d32; }
+        .strategy-accept    { background-color: #fff8e1; color: #f57c00; }
+        .strategy-transfer  { background-color: #e3f2fd; color: #1565c0; }
+        .strategy-avoid     { background-color: #ffebee; color: #c62828; }
+
+        /* DELETE CONFIRM MODAL — exactly matches asset inventory confirm modal */
+        #deleteConfirmOverlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        #deleteConfirmOverlay.show { opacity: 1; visibility: visible; }
+
+        .delete-confirm-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem 2rem 2rem;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            text-align: center;
+            transform: translateY(-24px) scale(0.97);
+            transition: var(--transition);
+        }
+        #deleteConfirmOverlay.show .delete-confirm-box { transform: translateY(0) scale(1); }
+
+        .delete-confirm-icon-wrap {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 3px solid #e53e3e;
+            color: #e53e3e;
+            background: rgba(229,62,62,0.07);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.4rem;
+            font-size: 2rem;
+        }
+
+        .delete-confirm-box h3 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        .delete-confirm-box p {
+            font-size: 0.97rem;
+            color: #64748b;
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+
+        .delete-confirm-actions { display: flex; justify-content: center; gap: 1rem; }
+
+        .delete-confirm-no {
+            padding: 0.65rem 2.2rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray);
+            background: white;
+            color: var(--dark);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .delete-confirm-no:hover { background: #f1f5f9; }
+
+        .delete-confirm-yes {
+            padding: 0.65rem 2.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            background: #e53e3e;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .delete-confirm-yes:hover { background: #c53030; }
+
+        /* ALERTS */
+        .alert {
+            position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+            border-radius: 8px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000000;
+            max-width: 450px; background: white;
+        }
+        .alert-success { border-left: 4px solid #2e7d32; color: #2e7d32; }
+        .alert-error   { border-left: 4px solid #c62828; color: #c62828; }
+        .alert-info    { border-left: 4px solid #1565c0; color: #1565c0; }
+        .alert i { font-size: 22px; }
+        .alert span { flex: 1; font-size: 14px; }
+        .alert-close { background: none; border: none; cursor: pointer; color: #6c757d; font-size: 16px; padding: 0; }
+        .alert-close:hover { color: #333; }
+
+        /* FOOTER */
+        .footer { background-color: var(--primary); color: white; padding: 1.5rem 2rem; margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; flex-wrap: wrap; }
+        .footer-links { display: flex; gap: 1.5rem; }
+        .footer-link { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
+        .footer-link:hover { color: white; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar { padding: 0.8rem 1rem; }
+            .container { padding: 1rem; }
+            .page-header { flex-direction: column; }
+            .filters-container { flex-direction: column; align-items: stretch; }
+            #riskDetailModal .modal-content { width: 95%; max-height: 95vh; }
+            .detail-table th { width: 30%; }
+            .footer-content { flex-direction: column; text-align: center; gap: 1rem; }
+            .footer-links { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="logo-text">RiskMate</div>
+        </div>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+            <a href="/asset-inventory" class="nav-item"><i class="fas fa-server"></i><span>Asset Inventory</span></a>
+            <a href="/risk-register" class="nav-item active"><i class="fas fa-list"></i><span>Risk Register</span></a>
+            <a href="/risk-assessment" class="nav-item"><i class="fas fa-clipboard-check"></i><span>Risk Assessment</span></a>
+            <a href="/analyze-risk" class="nav-item"><i class="fas fa-chart-line"></i><span>Analyze Risk</span></a>
+            <a href="/respond-to-risk" class="nav-item"><i class="fas fa-tasks"></i><span>Respond to Risk</span></a>
+            <a href="/reports" class="nav-item"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+        </div>
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="currentUser">Ahmed Khan</div>
+                <div class="user-role" id="currentRole">Security Engineer</div>
+            </div>
+            <div class="user-profile" id="userProfile">
+                <div class="avatar" id="userAvatar">A</div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Ahmed Khan</div>
+                        <div class="dropdown-user-role" id="dropdownUserRole">Security Engineer</div>
+                    </div>
+                    <div class="dropdown-item"><i class="fas fa-cog"></i><span>Account Settings</span></div>
+                    <div class="dropdown-item"><i class="fas fa-question-circle"></i><span>Help & Support</span></div>
+                    <div class="dropdown-item danger" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Organizational Risk Register</h1>
+                <p class="page-description">Manage and review all identified risks with filters and prioritization metrics.</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="exportBtn"><i class="fas fa-download"></i> Export Data (CSV)</button>
+                <button class="btn btn-danger" id="resetAssessmentBtn" style="display:none;"><i class="fas fa-redo"></i> Reset Risk Assessment</button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="globalSearch" placeholder="Search asset name...">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Asset Type:</span>
+                <select class="filter-select" id="typeFilter"><option value="all">All Types</option></select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Risk Level:</span>
+                <select class="filter-select" id="riskLevelFilter"><option value="all">All Levels</option></select>
+            </div>
+        </div>
+
+        <!-- Risk Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">Risk Register</h2>
+                <div class="table-summary" id="tableSummary">Loading risks...</div>
+            </div>
+            <table class="asset-table" id="riskTable">
+                <thead>
+                    <tr>
+                        <th>Asset Name</th>
+                        <th>Quantitative Risk Score</th>
+                        <th>Qualitative Risk Score</th>
+                        <th>ISO/IEC 27005 Risk Score</th>
+                        <th>BIA Score</th>
+                        <th>BIA Risk Priority</th>
+                        <th>Risk Level</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="riskTableBody"></tbody>
+            </table>
+            <div class="table-empty" id="tableEmpty">
+                <i class="fas fa-inbox"></i>
+                <p>No risks found</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RISK DETAIL MODAL -->
+    <div id="riskDetailModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Risk Details
+                </h3>
+                <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading risk details...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCloseFooter">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+    <div id="deleteConfirmOverlay">
+        <div class="delete-confirm-box">
+            <div class="delete-confirm-icon-wrap">
+                <i class="fas fa-trash"></i>
+            </div>
+            <h3>Delete Risk?</h3>
+            <p>Are you sure you want to delete this risk?<br>This action cannot be undone.</p>
+            <div class="delete-confirm-actions">
+                <button class="delete-confirm-no" id="deleteConfirmNo">No</button>
+                <button class="delete-confirm-yes" id="deleteConfirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">Automated Risk Analysis Framework (NIST 800-30 / ISO 27005)</div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About This Project</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="footer-copyright">© 2025 CyberRisk Analytics Institute</div>
+        </div>
+    </footer>
+
+    <script>
+        let risksData = [];
+        let assetTypes = [];
+        let riskLevels = [];
+        let pendingDeleteId = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadFilters();
+            loadRisks();
+
+            document.getElementById('globalSearch').addEventListener('input', filterRisks);
+            document.getElementById('typeFilter').addEventListener('change', filterRisks);
+            document.getElementById('riskLevelFilter').addEventListener('change', filterRisks);
+            document.getElementById('exportBtn').addEventListener('click', exportRisks);
+            document.getElementById('resetAssessmentBtn').addEventListener('click', resetRiskAssessment);
+
+            document.getElementById('modalClose').addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation(); closeModal();
+            });
+            document.getElementById('modalCloseFooter').addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation(); closeModal();
+            });
+            document.getElementById('riskDetailModal').addEventListener('click', function (e) {
+                if (e.target === this) closeModal();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && document.getElementById('riskDetailModal').classList.contains('show')) closeModal();
+            });
+
+            document.getElementById('userProfile').addEventListener('click', function () {
+                document.getElementById('profileDropdown').classList.toggle('show');
+            });
+            document.addEventListener('click', function (e) {
+                if (!document.getElementById('userProfile').contains(e.target))
+                    document.getElementById('profileDropdown').classList.remove('show');
+            });
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                window.location.href = '/logout';
+            });
+
+            document.getElementById('deleteConfirmNo').addEventListener('click', function () {
+                document.getElementById('deleteConfirmOverlay').classList.remove('show');
+                document.body.style.overflow = '';
+                pendingDeleteId = null;
+            });
+            document.getElementById('deleteConfirmYes').addEventListener('click', function () {
+                document.getElementById('deleteConfirmOverlay').classList.remove('show');
+                document.body.style.overflow = '';
+                if (pendingDeleteId) { deleteRisk(pendingDeleteId); pendingDeleteId = null; }
+            });
+            document.getElementById('deleteConfirmOverlay').addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                    document.body.style.overflow = '';
+                    pendingDeleteId = null;
+                }
+            });
+
+            highlightActiveNav();
+        });
+
+        function highlightActiveNav() {
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === path) item.classList.add('active');
+            });
+        }
+
+        function loadFilters() {
+            fetch('/api/risk-register/filters')
+                .then(r => r.json())
+                .then(data => {
+                    assetTypes = data.asset_types || [];
+                    riskLevels = data.risk_levels || [];
+                    populateFilters();
+                })
+                .catch(err => console.error('Error loading filters:', err));
+        }
+
+        function populateFilters() {
+            const typeFilter = document.getElementById('typeFilter');
+            const riskLevelFilter = document.getElementById('riskLevelFilter');
+            typeFilter.innerHTML = '<option value="all">All Types</option>';
+            riskLevelFilter.innerHTML = '<option value="all">All Levels</option>';
+            assetTypes.forEach(type => {
+                const opt = document.createElement('option');
+                opt.value = type.value || type.asset_type;
+                opt.textContent = type.label || type.asset_type;
+                typeFilter.appendChild(opt);
+            });
+            riskLevels.forEach(level => {
+                const opt = document.createElement('option');
+                opt.value = level.value;
+                opt.textContent = level.label;
+                riskLevelFilter.appendChild(opt);
+            });
+        }
+
+        function loadRisks() {
+            const summary = document.getElementById('tableSummary');
+            if (summary) summary.textContent = 'Loading risks...';
+            fetch('/api/risk-register/risks')
+                .then(r => r.json())
+                .then(data => {
+                    risksData = data;
+                    displayRisks(risksData);
+                    updateSummary(risksData.length);
+                })
+                .catch(err => {
+                    console.error('Error loading risks:', err);
+                    if (summary) summary.textContent = 'Error loading risks';
+                    showAlert('Error loading risk data', 'error');
+                });
+        }
+
+        function displayRisks(risks) {
+            const tbody = document.getElementById('riskTableBody');
+            const emptyDiv = document.getElementById('tableEmpty');
+            const table = document.getElementById('riskTable');
+            if (!tbody) return;
+            if (!risks || risks.length === 0) {
+                tbody.innerHTML = '';
+                emptyDiv.style.display = 'flex';
+                table.style.display = 'none';
+                return;
+            }
+            emptyDiv.style.display = 'none';
+            table.style.display = 'table';
+            let html = '';
+            risks.forEach(risk => {
+                const levelClass = getRiskLevelClass(risk.risk_level);
+                html += `
+                    <tr class="risk-row" data-risk-id="${risk.risk_id}">
+                        <td>${escapeHtml(risk.asset_name || 'N/A')}</td>
+                        <td>${formatNumber(risk.quantitative_risk_score, true)}</td>
+                        <td>${formatNumber(risk.qualitative_risk_score)}</td>
+                        <td>${formatNumber(risk.iso_27005_risk_score, true)}</td>
+                        <td>${formatNumber(risk.bia_score, true)}</td>
+                        <td>${formatNumber(risk.bia_risk_priority, true)}</td>
+                        <td><span class="risk-badge ${levelClass}">${risk.risk_level || 'Unknown'}</span></td>
+                        <td>
+                            <button class="btn-icon delete-risk" data-risk-id="${risk.risk_id}" title="Delete Risk">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+            tbody.innerHTML = html;
+            document.querySelectorAll('.risk-row').forEach(row => {
+                row.addEventListener('click', function (e) {
+                    if (e.target.closest('.delete-risk')) return;
+                    showRiskDetails(this.dataset.riskId);
+                });
+            });
+            document.querySelectorAll('.delete-risk').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    confirmDeleteRisk(this.dataset.riskId);
+                });
+            });
+        }
+
+        function filterRisks() {
+            const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
+            const typeVal = document.getElementById('typeFilter').value;
+            const levelVal = document.getElementById('riskLevelFilter').value;
+            const filtered = risksData.filter(risk => {
+                const matchSearch = !searchTerm || (risk.asset_name && risk.asset_name.toLowerCase().includes(searchTerm));
+                const matchType  = typeVal === 'all' || risk.asset_type === typeVal;
+                const matchLevel = levelVal === 'all' || risk.risk_level === levelVal;
+                return matchSearch && matchType && matchLevel;
+            });
+            displayRisks(filtered);
+            updateSummary(filtered.length);
+        }
+
+        function updateSummary(count) {
+            const el = document.getElementById('tableSummary');
+            if (el) el.textContent = count === 1 ? 'Showing 1 risk' : `Showing ${count} risks`;
+        }
+
+        function showRiskDetails(riskId) {
+            const modalBody = document.getElementById('modalBody');
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin fa-3x"></i>
+                        <p>Loading risk details...</p>
+                    </div>`;
+            }
+            openModal();
+            fetch(`/api/risk-register/risks/${riskId}/details`)
+                .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+                .then(risk => populateRiskModal(risk))
+                .catch(err => {
+                    console.error('Error loading risk details:', err);
+                    if (modalBody) {
+                        modalBody.innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-circle fa-3x"></i>
+                                <p>Error loading risk details: ${err.message}</p>
+                                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                            </div>`;
+                    }
+                    showAlert('Error loading risk details', 'error');
+                });
+        }
+
+        function openModal() {
+            document.getElementById('riskDetailModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('riskDetailModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function populateRiskModal(risk) {
+            const modalBody = document.getElementById('modalBody');
+            if (!modalBody) return;
+
+            const biaPriority = risk.bia_priority ||
+                (risk.qualitative_risk_score && risk.asset_value ? risk.qualitative_risk_score * risk.asset_value : 0);
+            const levelClass = getRiskLevelClass(risk.risk_level);
+
+            let html = `
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-server"></i> Asset Information</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Asset Name:</th><td>${escapeHtml(risk.asset_name || 'N/A')}</td>
+                            <th>Asset Type:</th><td>${escapeHtml(risk.asset_type || 'N/A')}</td>
+                        </tr>
+                        <tr>
+                            <th>Asset Owner:</th><td>${escapeHtml(risk.asset_owner || 'N/A')}</td>
+                            <th>Asset Location:</th><td>${escapeHtml(risk.asset_location || 'N/A')}</td>
+                        </tr>
+                        <tr>
+                            <th>IP Address:</th><td>${escapeHtml(risk.ip_address || 'N/A')}</td>
+                            <th>Asset Value:</th><td>${formatNumber(risk.asset_value, true) || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Description:</th><td colspan="3">${escapeHtml(risk.asset_description || 'No description')}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-shield-alt"></i> CIA Impacts</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Confidentiality:</th><td><span class="cia-badge">${risk.confidentiality || '3'}</span></td>
+                            <th>Integrity:</th><td><span class="cia-badge">${risk.integrity || '3'}</span></td>
+                            <th>Availability:</th><td><span class="cia-badge">${risk.availability || '3'}</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-chart-line"></i> Risk Scores</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Risk Level:</th>
+                            <td colspan="3"><span class="risk-badge ${levelClass}">${risk.risk_level}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Qualitative (NIST):</th><td>${formatNumber(risk.qualitative_risk_score)}</td>
+                            <th>Quantitative (ALE):</th><td>${formatNumber(risk.quantitative_risk_score, true)}</td>
+                        </tr>
+                        <tr>
+                            <th>ISO 27005:</th><td>${formatNumber(risk.iso_27005_risk_score, true)}</td>
+                            <th>BIA Priority:</th><td>${formatNumber(biaPriority, true)}</td>
+                        </tr>`;
+
+            if (risk.annual_rate_of_occurrence) {
+                html += `
+                        <tr>
+                            <th>ARO:</th><td>${risk.annual_rate_of_occurrence}</td>
+                            <th>EF:</th><td>${risk.exposure_factor || 0}%</td>
+                        </tr>
+                        <tr>
+                            <th>SLE:</th><td colspan="3">${formatNumber(risk.single_loss_expectancy, true) || '-'}</td>
+                        </tr>`;
+            }
+            html += `</table></div>
+
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-bug"></i> Vulnerability Information</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Vulnerability:</th><td colspan="3">${escapeHtml(risk.vulnerability_name || 'N/A')}</td>
+                        </tr>
+                        <tr>
+                            <th>Description:</th><td colspan="3">${escapeHtml(risk.vulnerability_description || 'No description')}</td>
+                        </tr>`;
+
+            if (risk.cves && risk.cves.length > 0) {
+                html += `<tr><th>CVEs:</th><td colspan="3"><ul class="cve-list">`;
+                risk.cves.forEach(cve => {
+                    const sev = cve.cve_severity ? `cve-${cve.cve_severity.toLowerCase()}` : '';
+                    html += `<li class="${sev}"><strong>${escapeHtml(cve.cve_id)}</strong> (Score: ${cve.cve_score || 'N/A'}, Severity: ${cve.cve_severity || 'Unknown'})</li>`;
+                });
+                html += `</ul></td></tr>`;
+            }
+
+            if (risk.threats && risk.threats.length > 0) {
+                html += `<tr><th>Threats:</th><td colspan="3"><ul class="threat-list">`;
+                risk.threats.forEach(threat => {
+                    html += `<li><strong>${escapeHtml(threat.threat_name)}</strong> (Source: ${threat.source || 'N/A'}, Likelihood: ${threat.likelihood || 'N/A'})</li>`;
+                });
+                html += `</ul></td></tr>`;
+            }
+
+            html += `</table></div>`;
+
+            if (risk.controls && risk.controls.length > 0) {
+                html += `
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-tasks"></i> Controls (${risk.controls.length})</h4>
+                    <table class="detail-table">
+                        <tr><th>Name</th><th>Type</th><th>Status</th><th>Effectiveness</th></tr>`;
+                risk.controls.forEach(ctrl => {
+                    const effClass = ctrl.effectiveness ? `effectiveness-${ctrl.effectiveness.toLowerCase()}` : '';
+                    html += `<tr>
+                        <td>${escapeHtml(ctrl.name || 'N/A')}</td>
+                        <td>${escapeHtml(ctrl.type || 'N/A')}</td>
+                        <td>${escapeHtml(ctrl.status || 'N/A')}</td>
+                        <td class="${effClass}">${escapeHtml(ctrl.effectiveness || 'N/A')}</td>
+                    </tr>`;
+                });
+                html += `</table></div>`;
+            }
+
+            if (risk.treatment_plan) {
+                const tp = risk.treatment_plan;
+                html += `
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-clipboard-check"></i> Treatment Plan</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Strategy:</th>
+                            <td colspan="3"><span class="strategy-badge strategy-${(tp.strategy || '').toLowerCase()}">${escapeHtml(tp.strategy || 'N/A')}</span></td>
+                        </tr>
+                        <tr>
+                            <th>Justification:</th>
+                            <td colspan="3">${escapeHtml(tp.justification || 'N/A')}</td>
+                        </tr>`;
+                if (tp.strategy === 'Transfer' && tp.transfer_method) {
+                    html += `
+                        <tr>
+                            <th>Transfer Method:</th><td>${escapeHtml(tp.transfer_method || 'N/A')}</td>
+                            <th>Transfer Party:</th><td>${escapeHtml(tp.transfer_party || 'N/A')}</td>
+                        </tr>
+                        <tr><th>Transfer Details:</th><td colspan="3">${escapeHtml(tp.transfer_details || 'N/A')}</td></tr>`;
+                }
+                if (tp.strategy === 'Avoid' && tp.avoidance_plan) {
+                    html += `
+                        <tr><th>Avoidance Plan:</th><td colspan="3">${escapeHtml(tp.avoidance_plan || 'N/A')}</td></tr>
+                        <tr>
+                            <th>Timeline:</th><td>${escapeHtml(tp.avoidance_timeline || 'N/A')}</td>
+                            <th>Impact:</th><td>${escapeHtml(tp.avoidance_impact || 'N/A')}</td>
+                        </tr>`;
+                }
+                if (tp.approver) {
+                    html += `
+                        <tr>
+                            <th>Approver:</th><td>${escapeHtml(tp.approver || 'N/A')}</td>
+                            <th>Approval Date:</th><td>${tp.approval_date || 'N/A'}</td>
+                        </tr>`;
+                }
+                html += `</table></div>`;
+            }
+
+            html += `
+                <div class="risk-detail-section">
+                    <h4><i class="fas fa-info-circle"></i> Assessment Information</h4>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Assessed By:</th><td>${escapeHtml(risk.assessed_by || 'N/A')}</td>
+                            <th>Assessment Date:</th><td>${risk.created_at ? new Date(risk.created_at).toLocaleString() : 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Updated:</th><td colspan="3">${risk.updated_at ? new Date(risk.updated_at).toLocaleString() : 'N/A'}</td>
+                        </tr>
+                    </table>
+                </div>`;
+
+            modalBody.innerHTML = html;
+        }
+
+        function confirmDeleteRisk(riskId) {
+            pendingDeleteId = riskId;
+            document.getElementById('deleteConfirmOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function deleteRisk(riskId) {
+            fetch(`/api/risk-register/risks/${riskId}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) { showAlert('Risk deleted successfully', 'success'); loadRisks(); }
+                    else showAlert(data.error || 'Error deleting risk', 'error');
+                })
+                .catch(err => { console.error('Error deleting risk:', err); showAlert('Error deleting risk', 'error'); });
+        }
+
+        function exportRisks() { window.location.href = '/api/risk-register/export'; }
+
+        function resetRiskAssessment() {
+            if (!confirm('WARNING: This will permanently delete ALL risks, controls, treatment plans, and mappings. Are you sure?')) return;
+            const confirmation = prompt('Type "RESET" to confirm:');
+            if (confirmation !== 'RESET') { showAlert('Reset cancelled', 'info'); return; }
+            showAlert('Resetting risk assessment data...', 'info');
+            fetch('/api/risk-register/reset', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) { showAlert(data.message, 'success'); loadRisks(); }
+                    else showAlert(data.error || 'Error resetting', 'error');
+                })
+                .catch(err => { console.error('Error resetting:', err); showAlert('Error resetting assessment', 'error'); });
+        }
+
+        function getRiskLevelClass(level) {
+            switch (level) {
+                case 'Critical':  return 'level-critical';
+                case 'Very High': return 'level-very-high';
+                case 'High':      return 'level-high';
+                case 'Medium':    return 'level-medium';
+                case 'Low':       return 'level-low';
+                default:          return 'level-unknown';
+            }
+        }
+
+        function formatNumber(value, isCurrency = false) {
+            if (value === null || value === undefined || value === 0) return '-';
+            const num = parseFloat(value);
+            if (isNaN(num)) return '-';
+            if (isCurrency) {
+                if (num >= 1000000) return '$' + (num / 1000000).toFixed(2) + 'M';
+                if (num >= 1000)    return '$' + (num / 1000).toFixed(2) + 'K';
+                return '$' + num.toFixed(2);
+            } else {
+                if (num >= 1000000)        return (num / 1000000).toFixed(2) + 'M';
+                if (num >= 1000)           return (num / 1000).toFixed(2) + 'K';
+                if (Number.isInteger(num)) return num.toString();
+                return num.toFixed(2);
+            }
+        }
+
+        function escapeHtml(unsafe) {
+            if (!unsafe) return unsafe;
+            return unsafe.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+
+        function showAlert(message, type = 'info') {
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = `
+                <i class="fas ${icons[type] || icons.info}"></i>
+                <span>${escapeHtml(message)}</span>
+                <button class="alert-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => { if (alertDiv.parentNode) alertDiv.remove(); }, 5000);
+        }
+    </script>
+</body>
+</html>

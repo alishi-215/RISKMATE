@@ -1,0 +1,2552 @@
+<!-- templates/analyze_risk.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automated Risk Analysis Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #2c5282;
+            --accent: #0e9f6e;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --success: #38a169;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header and Navigation */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.2rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            padding: 0.5rem 0.85rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item span {
+            font-size: 0.75rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            color: var(--accent);
+        }
+
+        .user-profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 220px;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .dropdown-user-role {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-item.danger:hover {
+            background-color: #fee2e2;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        .dropdown-item.danger i {
+            color: var(--danger);
+        }
+
+        .container {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 0.3rem;
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        /* Standard Selector */
+        .standard-selector {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .standard-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Selection Card */
+        .selection-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .selection-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 159, 110, 0.2);
+        }
+
+        /* Impact Display */
+        .impact-display {
+            background-color: #f0fdf4;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .impact-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-right: 0.5rem;
+        }
+
+        .impact-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .calculation-details {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .calculation-details strong {
+            color: var(--dark);
+        }
+
+        /* Asset Info Card */
+        .asset-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .asset-info {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .asset-info-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .asset-detail {
+            display: flex;
+            margin-bottom: 0.8rem;
+            align-items: center;
+        }
+
+        .detail-label {
+            width: 150px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .detail-value {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .criticality-level {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .level-very-high { background-color: rgba(229, 62, 62, 0.15); color: var(--danger); }
+        .level-high { background-color: rgba(221, 107, 32, 0.15); color: var(--warning); }
+        .level-medium { background-color: rgba(49, 130, 206, 0.15); color: var(--info); }
+        .level-low { background-color: rgba(56, 161, 105, 0.15); color: var(--success); }
+        .level-very-low { background-color: rgba(56, 161, 105, 0.1); color: var(--success); }
+        .level-critical { background-color: rgba(112, 36, 89, 0.15); color: #702459; }
+
+        /* Analysis Mode Selector */
+        .mode-selector {
+            display: flex;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .mode-tab:hover {
+            background-color: #f8fafc;
+        }
+
+        .mode-tab.active {
+            border-bottom-color: var(--accent);
+            background-color: #f0fdf4;
+        }
+
+        .mode-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #64748b;
+        }
+
+        .mode-tab.active .mode-icon {
+            color: var(--accent);
+        }
+
+        .mode-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .mode-description {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Analysis Content */
+        .analysis-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .analysis-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-description {
+            color: #64748b;
+        }
+
+        /* Automated Values Display */
+        .auto-value {
+            background-color: #f0fdf4;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            color: var(--accent);
+            display: inline-block;
+        }
+
+        .automated-section {
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .automated-row {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .auto-label {
+            width: 200px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .auto-value-box {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Risk Matrix */
+        .risk-matrix-container {
+            margin: 2rem 0;
+        }
+
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 2px;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .matrix-header {
+            background-color: #f8fafc;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .matrix-cell {
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .matrix-cell.low { background-color: rgba(56, 161, 105, 0.1); color: var(--success); }
+        .matrix-cell.medium { background-color: rgba(221, 107, 32, 0.1); color: var(--warning); }
+        .matrix-cell.high { background-color: rgba(229, 62, 62, 0.1); color: var(--danger); }
+        .matrix-cell.very-high { background-color: rgba(229, 62, 62, 0.2); color: var(--danger); }
+        .matrix-cell.critical { background-color: rgba(112, 36, 89, 0.2); color: #702459; }
+
+        .matrix-cell.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px var(--accent);
+            z-index: 1;
+        }
+
+        .matrix-cell .risk-score {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .matrix-cell .risk-level {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .matrix-impact-label {
+            background-color: #f8fafc;
+            padding: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 2px solid #e2e8f0;
+        }
+
+        .matrix-likelihood-label {
+            background-color: #f8fafc;
+            padding: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        /* Result Display */
+        .result-container {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .result-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .result-level {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        /* Calculation Breakdown */
+        .calculation-breakdown {
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .breakdown-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .breakdown-formula {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+        }
+
+        .formula-text {
+            flex: 1;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        .formula-result {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        /* Next Steps */
+        .next-steps {
+            background-color: #f0fdf4;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent);
+        }
+
+        .next-steps-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .next-steps-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0c7a55;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #2d8555;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-container {
+                flex-direction: column;
+            }
+            
+            .risk-matrix {
+                grid-template-columns: repeat(6, minmax(100px, 1fr));
+                overflow-x: auto;
+            }
+            
+            .auto-label {
+                width: 150px;
+            }
+            
+            .quantitative-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.8rem;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .asset-card {
+                flex-direction: column;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+            }
+            
+            .next-steps-buttons {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .risk-matrix {
+                font-size: 0.8rem;
+            }
+            
+            .matrix-cell {
+                padding: 0.5rem;
+                min-height: 60px;
+            }
+            
+            .auto-label {
+                width: 120px;
+            }
+            
+            .slider-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-success {
+            background-color: rgba(56, 161, 105, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background-color: rgba(229, 62, 62, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-info {
+            background-color: rgba(49, 130, 206, 0.1);
+            color: var(--info);
+            border-left: 4px solid var(--info);
+        }
+
+        /* Risk Level Legend */
+        .risk-legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-critical { background-color: rgba(112, 36, 89, 0.2); }
+        .legend-very-high { background-color: rgba(229, 62, 62, 0.2); }
+        .legend-high { background-color: rgba(229, 62, 62, 0.1); }
+        .legend-medium { background-color: rgba(221, 107, 32, 0.1); }
+        .legend-low { background-color: rgba(56, 161, 105, 0.1); }
+        
+        /* Quantitative Analysis */
+        .quantitative-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quantitative-result {
+            background-color: #f0fdf4;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--info);
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .result-item-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .result-item-value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        /* ISO Specific */
+        .iso-formula {
+            font-family: monospace;
+            background-color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            border-left: 4px solid var(--info);
+        }
+        
+        .auto-badge {
+            background-color: #e0f2fe;
+            color: var(--info);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .info-badge {
+            background-color: #e0f2fe;
+            color: var(--info);
+        }
+        
+        .warning-badge {
+            background-color: rgba(221, 107, 32, 0.15);
+            color: var(--warning);
+        }
+        
+        /* Slider for Quantitative */
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .slider {
+            flex: 1;
+            /* -webkit-appearance: none; */
+            height: 8px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .form-tooltip {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+            <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="logo-text"> RiskMate </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item" id="nav-dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/asset-inventory" class="nav-item" id="nav-asset-inventory">
+                <i class="fas fa-server"></i>
+                <span>Asset Inventory</span>
+            </a>
+            <a href="/risk-register" class="nav-item" id="nav-risk-register">
+                <i class="fas fa-list"></i>
+                <span>Risk Register</span>
+            </a>
+            <a href="/risk-assessment" class="nav-item" id="nav-risk-assessment">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Risk Assessment</span>
+            </a>
+            <a href="/analyze-risk" class="nav-item active" id="nav-analyze-risk">
+                <i class="fas fa-chart-line"></i>
+                <span>Analyze Risk</span>
+            </a>
+            <a href="/respond-to-risk" class="nav-item" id="nav-respond-to-risk">
+                <i class="fas fa-tasks"></i>
+                <span>Respond to Risk</span>
+            </a>
+            <a href="/reports" class="nav-item" id="nav-reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="currentUser">Ahmed Khan</div>
+                <div class="user-role" id="currentRole">Security Engineer</div>
+            </div>
+            <div class="user-profile" id="userProfile">
+                <div class="avatar" id="userAvatar">A</div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Ahmed Khan</div>
+                        <div class="dropdown-user-role" id="dropdownUserRole">Security Engineer</div>
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Account Settings</span>
+                    </div>
+                    <div class="dropdown-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help &amp; Support</span>
+                    </div>
+                    <div class="dropdown-item danger" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Automated Risk Analysis</h1>
+                <p class="page-description">Select an asset and vulnerability to automatically calculate risk using NIST 800-30 or ISO/IEC 27005 frameworks.</p>
+            </div>
+        </div>
+        
+        <!-- Alert Messages -->
+        <div id="alert-container"></div>
+        
+        <!-- Standard Selection -->
+        <div class="standard-selector">
+            <div>
+                <label class="form-label" for="standard-select">Assessment Standard</label>
+                <select class="form-select" id="standard-select">
+                    <option value="nist">NIST SP 800-30</option>
+                    <option value="iso">ISO/IEC 27005</option>
+                </select>
+            </div>
+            <div>
+                <span class="standard-badge" id="current-standard">NIST SP 800-30</span>
+            </div>
+        </div>
+        
+        <!-- Selection Card -->
+        <div class="selection-card">
+            <h3 class="selection-title">Select Asset and Vulnerability</h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label" for="asset-select">Asset</label>
+                    <select class="form-select" id="asset-select">
+                        <option value="">Select an asset</option>
+                        {% for asset in assets %}
+                        <option value="{{ asset.id }}" 
+                                data-criticality="{{ asset.criticality_value }}"
+                                data-asset-value="{{ asset.asset_value or '' }}"
+                                data-confidentiality="{{ asset.confidentiality or '3' }}"
+                                data-integrity="{{ asset.integrity or '3' }}"
+                                data-availability="{{ asset.availability or '3' }}"
+                                data-owner="{{ asset.owner or '' }}">
+                            {{ asset.name }} ({{ asset.type }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-tooltip">Asset value, criticality, and CIA values will be automatically fetched</small>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="vulnerability-select">Vulnerability</label>
+                    <select class="form-select" id="vulnerability-select">
+                        <option value="">Select a vulnerability</option>
+                        {% for vuln in vulnerabilities %}
+                        <option value="{{ vuln.id }}" 
+                                data-asset-id="{{ vuln.asset_id }}"
+                                data-severity="{{ vuln.severity_value }}"
+                                data-cvss="{{ vuln.cvss_score or 0 }}"
+                                data-likelihood="{{ vuln.likelihood or '3' }}">
+                            {{ vuln.name }} (Severity: {{ vuln.severity_label }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-tooltip">Severity and likelihood will be automatically fetched from database</small>
+                </div>
+            </div>
+            
+            <!-- Impact Display (Auto-calculated) -->
+            <div class="impact-display hidden" id="impact-display">
+                <div>
+                    <span class="impact-value" id="impact-value">0</span>
+                    <span class="impact-label">Calculated Impact Score</span>
+                    <div class="calculation-details" id="impact-formula">
+                        <strong>Impact Formula:</strong> (Severity × Criticality) ÷ 5
+                        <br>
+                        Severity: <span class="auto-value" id="severity-value">0</span> × 
+                        Criticality: <span class="auto-value" id="criticality-value">0</span> ÷ 5
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="analyze-btn">
+                <i class="fas fa-search"></i>
+                Analyze Risk
+            </button>
+        </div>
+        
+        <!-- Asset Info Card (initially hidden) -->
+        <div class="asset-card hidden" id="asset-info-card">
+            <div class="asset-info">
+                <h3 class="asset-info-title">Asset Information</h3>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Asset Name:</div>
+                    <div class="detail-value" id="asset-name">-</div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Vulnerability:</div>
+                    <div class="detail-value" id="vulnerability-name">-</div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Asset Type:</div>
+                    <div class="detail-value" id="asset-type">-</div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Asset Owner:</div>
+                    <div class="detail-value" id="asset-owner">-</div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Asset Value:</div>
+                    <div class="detail-value">
+                        <span class="auto-value" id="asset-value-display">$0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="asset-info">
+                <h3 class="asset-info-title">Risk Parameters (Auto-fetched)</h3>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Asset Criticality:</div>
+                    <div class="detail-value">
+                        <span class="criticality-level" id="criticality-level">-</span>
+                    </div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Vulnerability Severity:</div>
+                    <div class="detail-value">
+                        <span class="criticality-level" id="severity-level">-</span>
+                    </div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Likelihood:</div>
+                    <div class="detail-value">
+                        <span class="auto-value" id="likelihood-display">3</span>
+                    </div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">CIA Values:</div>
+                    <div class="detail-value">
+                        <span class="auto-badge">C: <span id="confidentiality-value">3</span></span>
+                        <span class="auto-badge">I: <span id="integrity-value">3</span></span>
+                        <span class="auto-badge">A: <span id="availability-value">3</span></span>
+                    </div>
+                </div>
+                
+                <div class="asset-detail">
+                    <div class="detail-label">Calculated Impact:</div>
+                    <div class="detail-value">
+                        <span class="auto-value" id="calculated-impact">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NIST Analysis Mode Selector (initially hidden) -->
+        <div class="mode-selector hidden" id="nist-mode-selector">
+            <div class="mode-tab active" data-mode="qualitative">
+                <div class="mode-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="mode-title">Qualitative</div>
+                <div class="mode-description">Risk = Likelihood × (Impact × 3)</div>
+            </div>
+            
+            <div class="mode-tab" data-mode="quantitative">
+                <div class="mode-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div class="mode-title">Quantitative</div>
+                <div class="mode-description">Financial risk estimation</div>
+            </div>
+        </div>
+        
+        <!-- ISO Analysis Mode Selector (initially hidden - single mode) -->
+        <div class="mode-selector hidden" id="iso-mode-selector">
+            <div class="mode-tab active" data-mode="iso">
+                <div class="mode-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="mode-title">ISO 27005</div>
+                <div class="mode-description">Asset Value × Business Impact × Likelihood</div>
+            </div>
+        </div>
+        
+        <!-- NIST Qualitative Analysis Content -->
+        <div class="analysis-content hidden" id="nist-qualitative-content">
+            <div class="analysis-header">
+                <h2 class="analysis-title">NIST 800-30 Qualitative Risk Assessment</h2>
+                <p class="analysis-description">Risk = Likelihood × (Impact × 3). All values are automatically fetched from database.</p>
+            </div>
+            
+            <!-- Automated Values Section -->
+            <div class="automated-section">
+                <h3 class="breakdown-title">Automated Input Values</h3>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Vulnerability Severity:</div>
+                    <div class="auto-value-box">
+                        <span class="criticality-level" id="nist-severity-level">Medium</span>
+                        <span class="auto-value" id="nist-severity-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Asset Criticality:</div>
+                    <div class="auto-value-box">
+                        <span class="criticality-level" id="nist-criticality-level">Medium</span>
+                        <span class="auto-value" id="nist-criticality-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Likelihood (from Threat):</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="nist-likelihood-value">3</span>
+                        <span class="auto-badge info-badge" id="nist-likelihood-label">Medium</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Calculated Impact:</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="nist-impact-value">0</span>
+                        <small>Formula: (Severity × Criticality) ÷ 5</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Risk Level Legend -->
+            <div class="risk-legend">
+                <div class="legend-item">
+                    <div class="legend-color legend-critical"></div>
+                    <span>Critical (45-75): Immediate action required</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-very-high"></div>
+                    <span>Very High (30-44): Senior management intervention</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-high"></div>
+                    <span>High (15-29): Mitigation in current sprint</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-medium"></div>
+                    <span>Medium (9-14): Routine monitoring</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color legend-low"></div>
+                    <span>Low (1-8): Risk acceptance</span>
+                </div>
+            </div>
+            
+            <!-- Risk Matrix -->
+            <div class="risk-matrix-container">
+                <h3 class="breakdown-title">Risk Matrix (Impact × 3 vs Likelihood)</h3>
+                <div class="risk-matrix" id="risk-matrix">
+                    <!-- Matrix will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="calculation-breakdown">
+                <h3 class="breakdown-title">Automated Calculation Breakdown</h3>
+                <div class="breakdown-formula">
+                    <div class="formula-text">Risk = Likelihood (<span id="nist-likelihood-breakdown">3</span>) × (Impact (<span id="nist-impact-breakdown">0</span>) × 3)</div>
+                    <div class="formula-result" id="nist-risk-result">0</div>
+                </div>
+                <div class="breakdown-formula" id="nist-detailed-formula">
+                    <!-- Detailed formula will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-card">
+                    <div class="result-label">Calculated Risk Score</div>
+                    <div class="result-value" id="nist-risk-score">0</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Risk Level</div>
+                    <div class="result-value" id="nist-risk-level-text">-</div>
+                    <div class="result-level" id="nist-risk-level-badge">-</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Risk Priority</div>
+                    <div class="result-value" id="nist-risk-priority">-</div>
+                    <div class="result-label" id="nist-priority-description">-</div>
+                </div>
+            </div>
+            
+            <!-- Save Risk Button -->
+            <div class="next-steps">
+                <h3 class="next-steps-title">Save NIST Qualitative Risk Assessment</h3>
+                <div class="next-steps-buttons">
+                    <button class="btn btn-success" id="save-nist-qual-btn">
+                        <i class="fas fa-save"></i>
+                        Save Assessment
+                    </button>
+                    <button class="btn btn-secondary" id="reset-analysis-btn">
+                        <i class="fas fa-redo"></i>
+                        Reset Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- NIST Quantitative Analysis Content -->
+        <div class="analysis-content hidden" id="nist-quantitative-content">
+            <div class="analysis-header">
+                <h2 class="analysis-title">NIST 800-30 Quantitative Risk Assessment</h2>
+                <p class="analysis-description">Estimate financial risk using asset value, exposure factor, and annual rate of occurrence.</p>
+            </div>
+            
+            <!-- Asset Value Display (Auto-fetched) -->
+            <div class="impact-display">
+                <div>
+                    <span class="impact-value" id="quant-asset-value-display">$0</span>
+                    <span class="impact-label">Asset Value (Auto-fetched from Database)</span>
+                    <div class="calculation-details">
+                        Asset value is automatically fetched from the assets table
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Inputs for Quantitative Analysis -->
+            <div class="quantitative-inputs">
+                <div class="form-group">
+                    <label class="form-label" for="quant-exposure-factor">Exposure Factor (EF) in %</label>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="100" value="25" class="slider" id="quant-exposure-factor">
+                        <span class="slider-value" id="quant-exposure-value">25%</span>
+                    </div>
+                    <span class="form-tooltip">The percentage of the asset's value that would be lost if this risk materialized.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="quant-aro">Annual Rate of Occurrence (ARO)</label>
+                    <select class="form-select" id="quant-aro">
+                        <option value="0.1">0.1 - Once every 10 years</option>
+                        <option value="0.25">0.25 - Once every 4 years</option>
+                        <option value="0.5" selected>0.5 - Once every 2 years</option>
+                        <option value="1">1 - Once per year</option>
+                        <option value="2">2 - Twice per year</option>
+                        <option value="4">4 - Quarterly</option>
+                        <option value="12">12 - Monthly</option>
+                        <option value="52">52 - Weekly</option>
+                    </select>
+                    <span class="form-tooltip">How many times is this incident expected to occur per year?</span>
+                </div>
+            </div>
+            
+            <div class="calculation-breakdown">
+                <h3 class="breakdown-title">Calculation Breakdown</h3>
+                <div class="breakdown-formula">
+                    <div class="formula-text">SLE (Single Loss Expectancy) = AV × EF</div>
+                    <div class="formula-result" id="sle-result">$0</div>
+                </div>
+                
+                <div class="breakdown-formula">
+                    <div class="formula-text">ALE (Annual Loss Expectancy) = SLE × ARO</div>
+                    <div class="formula-result" id="ale-result">$0</div>
+                </div>
+            </div>
+            
+            <div class="quantitative-result hidden" id="quantitative-result">
+                <h3 class="breakdown-title">Quantitative Risk Result</h3>
+                <div class="result-item">
+                    <div class="result-item-label">Asset Value (AV):</div>
+                    <div class="result-item-value" id="result-av">$0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">Exposure Factor (EF):</div>
+                    <div class="result-item-value" id="result-ef">25%</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">Single Loss Expectancy (SLE):</div>
+                    <div class="result-item-value" id="result-sle">$0</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">Annual Rate of Occurrence (ARO):</div>
+                    <div class="result-item-value" id="result-aro">0.5</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-item-label">Annual Loss Expectancy (ALE):</div>
+                    <div class="result-item-value" id="result-ale">$0</div>
+                </div>
+            </div>
+            
+            <div class="next-steps">
+                <h3 class="next-steps-title">Calculate & Save Quantitative Risk</h3>
+                <div class="next-steps-buttons">
+                    <button class="btn btn-primary" id="calculate-quant-btn">
+                        <i class="fas fa-calculator"></i>
+                        Calculate ALE
+                    </button>
+                    <button class="btn btn-success" id="save-nist-quant-btn">
+                        <i class="fas fa-save"></i>
+                        Save Assessment
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ISO Analysis Content -->
+        <div class="analysis-content hidden" id="iso-content">
+            <div class="analysis-header">
+                <h2 class="analysis-title">ISO/IEC 27005 Quantitative Risk Assessment</h2>
+                <p class="analysis-description">Risk Score = Asset Value × Business Impact (CIA Sum) × Likelihood. All values are automatically fetched from database.</p>
+            </div>
+            
+            <div class="iso-formula">
+                <strong>Automated Formula:</strong><br>
+                <code>Business Impact (BI) = Confidentiality + Integrity + Availability</code><br>
+                <code>Risk Score = Asset Value × Business Impact × Likelihood</code>
+            </div>
+            
+            <!-- Automated Values Section -->
+            <div class="automated-section">
+                <h3 class="breakdown-title">Automated Input Values</h3>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Asset Value:</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="iso-asset-value">$0</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Confidentiality Impact:</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="iso-confidentiality">3</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Integrity Impact:</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="iso-integrity">3</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Availability Impact:</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="iso-availability">3</span>
+                    </div>
+                </div>
+                
+                <div class="automated-row">
+                    <div class="auto-label">Likelihood (from Threat):</div>
+                    <div class="auto-value-box">
+                        <span class="auto-value" id="iso-likelihood">3</span>
+                        <span class="auto-badge info-badge" id="iso-likelihood-label">Medium</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="calculation-breakdown">
+                <h3 class="breakdown-title">Automated Calculation Breakdown</h3>
+                <div class="breakdown-formula">
+                    <div class="formula-text">
+                        Business Impact = C(<span id="iso-calc-confidentiality">3</span>) + I(<span id="iso-calc-integrity">3</span>) + A(<span id="iso-calc-availability">3</span>)
+                    </div>
+                    <div class="formula-result" id="iso-business-impact-result">9</div>
+                </div>
+                
+                <div class="breakdown-formula">
+                    <div class="formula-text">
+                        Risk Score = Asset Value(<span id="iso-calc-asset-value">0</span>) × 
+                        Business Impact(<span id="iso-calc-business-impact">9</span>) × 
+                        Likelihood(<span id="iso-calc-likelihood">3</span>)
+                    </div>
+                    <div class="formula-result" id="iso-risk-result">0</div>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-card">
+                    <div class="result-label">Asset Value</div>
+                    <div class="result-value" id="iso-final-asset-value">$0</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Business Impact</div>
+                    <div class="result-value" id="iso-final-business-impact">9</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Likelihood</div>
+                    <div class="result-value" id="iso-final-likelihood">3</div>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-card">
+                    <div class="result-label">Calculated Risk Score</div>
+                    <div class="result-value" id="iso-risk-score">0</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Risk Level</div>
+                    <div class="result-value" id="iso-risk-level">-</div>
+                    <div class="result-level warning-badge" id="iso-risk-level-badge">-</div>
+                </div>
+                
+                <div class="result-card">
+                    <div class="result-label">Financial Impact</div>
+                    <div class="result-value" id="iso-financial-impact">$0</div>
+                    <div class="result-label">Annual Loss Expectancy</div>
+                </div>
+            </div>
+            
+            <!-- Save Risk Button -->
+            <div class="next-steps">
+                <h3 class="next-steps-title">Save ISO 27005 Risk Assessment</h3>
+                <div class="next-steps-buttons">
+                    <button class="btn btn-success" id="save-iso-risk-btn">
+                        <i class="fas fa-save"></i>
+                        Save Assessment
+                    </button>
+                    <button class="btn btn-secondary" id="iso-reset-btn">
+                        <i class="fas fa-redo"></i>
+                        Reset Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+            <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                Automated Risk Analysis Framework (NIST 800-30 / ISO 27005)
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About This Project</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2025 CyberRisk Analytics Institute
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+                        // Profile dropdown
+            const userProfileEl = document.getElementById('userProfile');
+            const profileDropdownEl = document.getElementById('profileDropdown');
+            if (userProfileEl) {
+                userProfileEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdownEl.classList.toggle('show');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!userProfileEl.contains(e.target)) {
+                        profileDropdownEl.classList.remove('show');
+                    }
+                });
+            }
+            const logoutBtnEl = document.getElementById('logoutBtn');
+            if (logoutBtnEl) {
+                logoutBtnEl.addEventListener('click', function() {
+                    window.location.href = '/logout';
+                });
+            }
+            // Highlight active nav
+            (function() {
+                const path = window.location.pathname;
+                document.querySelectorAll('.nav-item').forEach(function(item) {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === path) item.classList.add('active');
+                });
+            })();
+            
+            // Standard selection
+            const standardSelect = document.getElementById('standard-select');
+            const currentStandardBadge = document.getElementById('current-standard');
+            const nistModeSelector = document.getElementById('nist-mode-selector');
+            const isoModeSelector = document.getElementById('iso-mode-selector');
+            
+            standardSelect.addEventListener('change', function() {
+                const standard = this.value;
+                const standardName = standard === 'nist' ? 'NIST SP 800-30' : 'ISO/IEC 27005';
+                currentStandardBadge.textContent = standardName;
+                
+                // Hide all content
+                document.getElementById('nist-qualitative-content').classList.add('hidden');
+                document.getElementById('nist-quantitative-content').classList.add('hidden');
+                document.getElementById('iso-content').classList.add('hidden');
+                nistModeSelector.classList.add('hidden');
+                isoModeSelector.classList.add('hidden');
+                
+                // Reset mode tabs
+                document.querySelectorAll('.mode-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                if (currentAnalysis) {
+                    if (standard === 'nist') {
+                        nistModeSelector.classList.remove('hidden');
+                        document.querySelector('#nist-mode-selector .mode-tab[data-mode="qualitative"]').classList.add('active');
+                        document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                        updateNistAnalysis(currentAnalysis);
+                    } else if (standard === 'iso') {
+                        // Check if asset has value for ISO
+                        const selectedAsset = document.getElementById('asset-select').options[document.getElementById('asset-select').selectedIndex];
+                        const assetValue = selectedAsset.getAttribute('data-asset-value');
+                        
+                        if (!assetValue || assetValue === '' || assetValue === '0') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Asset Value Missing',
+                                text: 'No Asset Value in database against this Asset. Cannot perform ISO analysis.',
+                                confirmButtonText: 'OK'
+                            });
+                            standardSelect.value = 'nist';
+                            currentStandardBadge.textContent = 'NIST SP 800-30';
+                            nistModeSelector.classList.remove('hidden');
+                            document.querySelector('#nist-mode-selector .mode-tab[data-mode="qualitative"]').classList.add('active');
+                            document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                            updateNistAnalysis(currentAnalysis);
+                            return;
+                        }
+                        
+                        isoModeSelector.classList.remove('hidden');
+                        document.getElementById('iso-content').classList.remove('hidden');
+                        updateIsoAnalysis(currentAnalysis);
+                    }
+                }
+            });
+            
+            // Asset and vulnerability selection
+            const assetSelect = document.getElementById('asset-select');
+            const vulnerabilitySelect = document.getElementById('vulnerability-select');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const assetInfoCard = document.getElementById('asset-info-card');
+            const impactDisplay = document.getElementById('impact-display');
+            
+            // Current analysis data
+            let currentAnalysis = null;
+            
+            // Filter vulnerabilities based on selected asset
+            assetSelect.addEventListener('change', function() {
+                const assetId = this.value;
+                const options = vulnerabilitySelect.options;
+                
+                // Show all options when no asset is selected
+                if (!assetId) {
+                    for (let i = 0; i < options.length; i++) {
+                        options[i].style.display = '';
+                    }
+                    impactDisplay.classList.add('hidden');
+                    assetInfoCard.classList.add('hidden');
+                    nistModeSelector.classList.add('hidden');
+                    isoModeSelector.classList.add('hidden');
+                    return;
+                }
+                
+                // Hide options that don't match the selected asset
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    if (option.value === '' || option.getAttribute('data-asset-id') === assetId) {
+                        option.style.display = '';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                }
+                
+                // Reset vulnerability selection if it's not compatible with the asset
+                if (vulnerabilitySelect.value && vulnerabilitySelect.options[vulnerabilitySelect.selectedIndex].getAttribute('data-asset-id') !== assetId) {
+                    vulnerabilitySelect.value = '';
+                    impactDisplay.classList.add('hidden');
+                    assetInfoCard.classList.add('hidden');
+                    nistModeSelector.classList.add('hidden');
+                    isoModeSelector.classList.add('hidden');
+                }
+            });
+            
+            // When vulnerability is selected, show preliminary impact calculation
+            vulnerabilitySelect.addEventListener('change', function() {
+                const assetId = assetSelect.value;
+                const vulnerabilityId = this.value;
+                
+                if (!assetId || !vulnerabilityId) {
+                    impactDisplay.classList.add('hidden');
+                    assetInfoCard.classList.add('hidden');
+                    nistModeSelector.classList.add('hidden');
+                    isoModeSelector.classList.add('hidden');
+                    return;
+                }
+                
+                const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                const selectedVuln = vulnerabilitySelect.options[vulnerabilitySelect.selectedIndex];
+                
+                const assetCriticality = parseInt(selectedAsset.getAttribute('data-criticality') || '3');
+                const vulnSeverity = parseInt(selectedVuln.getAttribute('data-severity') || '3');
+                
+                // Calculate impact: (Vulnerability Severity × Asset Criticality) / 5
+                const impact = (vulnSeverity * assetCriticality) / 5;
+                const impactDisplayValue = impact.toFixed(1);
+                
+                document.getElementById('impact-value').textContent = impactDisplayValue;
+                document.getElementById('severity-value').textContent = vulnSeverity;
+                document.getElementById('criticality-value').textContent = assetCriticality;
+                
+                impactDisplay.classList.remove('hidden');
+                
+                // Show basic asset info
+                updateBasicAssetInfo();
+            });
+            
+            // Analyze button click handler
+            analyzeBtn.addEventListener('click', function() {
+                const assetId = assetSelect.value;
+                const vulnerabilityId = vulnerabilitySelect.value;
+                
+                if (!assetId || !vulnerabilityId) {
+                    showAlert('Please select both an asset and a vulnerability to analyze.', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+                
+                // Call API to calculate risk
+                fetch('/api/analyze-risk/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        
+                    },
+                    body: JSON.stringify({
+                        asset_id: assetId,
+                        vulnerability_id: vulnerabilityId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    analyzeBtn.classList.remove('loading');
+                    analyzeBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Risk';
+                    
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    currentAnalysis = data;
+                    
+                    // Show analysis sections
+                    assetInfoCard.classList.remove('hidden');
+                    updateAssetInfo(data);
+                    
+                    // Show analysis based on current standard
+                    const standard = standardSelect.value;
+                    if (standard === 'nist') {
+                        nistModeSelector.classList.remove('hidden');
+                        document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                        document.getElementById('nist-quantitative-content').classList.add('hidden');
+                        document.getElementById('iso-content').classList.add('hidden');
+                        updateNistAnalysis(data);
+                        updateNistQuantitative(data);
+                    } else if (standard === 'iso') {
+                        // Check if asset has value for ISO
+                        const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                        const assetValue = selectedAsset.getAttribute('data-asset-value');
+                        
+                        if (!assetValue || assetValue === '' || assetValue === '0') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Asset Value Missing',
+                                text: 'No Asset Value in database against this Asset. Switching to NIST analysis.',
+                                confirmButtonText: 'OK'
+                            });
+                            standardSelect.value = 'nist';
+                            currentStandardBadge.textContent = 'NIST SP 800-30';
+                            nistModeSelector.classList.remove('hidden');
+                            document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                            document.getElementById('nist-quantitative-content').classList.add('hidden');
+                            document.getElementById('iso-content').classList.add('hidden');
+                            updateNistAnalysis(data);
+                            updateNistQuantitative(data);
+                            return;
+                        }
+                        
+                        isoModeSelector.classList.remove('hidden');
+                        document.getElementById('iso-content').classList.remove('hidden');
+                        document.getElementById('nist-qualitative-content').classList.add('hidden');
+                        document.getElementById('nist-quantitative-content').classList.add('hidden');
+                        updateIsoAnalysis(data);
+                    }
+                    
+                    showAlert('Risk analysis completed successfully! All values fetched from database.', 'success');
+                })
+                .catch(error => {
+                    analyzeBtn.classList.remove('loading');
+                    analyzeBtn.innerHTML = '<i class="fas fa-search"></i> Analyze Risk';
+                    showAlert('Error calculating risk: ' + error.message, 'error');
+                    console.error('Error:', error);
+                });
+            });
+            
+            // NIST mode tabs
+            const nistModeTabs = document.querySelectorAll('#nist-mode-selector .mode-tab');
+            nistModeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const mode = this.getAttribute('data-mode');
+                    
+                    // Update active tab
+                    nistModeTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show correct content
+                    document.getElementById('nist-qualitative-content').classList.add('hidden');
+                    document.getElementById('nist-quantitative-content').classList.add('hidden');
+                    
+                    if (mode === 'qualitative') {
+                        document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                        if (currentAnalysis) updateNistAnalysis(currentAnalysis);
+                    } else if (mode === 'quantitative') {
+                        // Check if asset has value for quantitative
+                        const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                        const assetValue = selectedAsset.getAttribute('data-asset-value');
+                        
+                        if (!assetValue || assetValue === '' || assetValue === '0') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Asset Value Missing',
+                                text: 'No Asset Value in database against this Asset. Cannot perform quantitative analysis.',
+                                confirmButtonText: 'OK'
+                            });
+                            // Switch back to qualitative
+                            document.querySelector('#nist-mode-selector .mode-tab[data-mode="qualitative"]').classList.add('active');
+                            document.getElementById('nist-qualitative-content').classList.remove('hidden');
+                            if (currentAnalysis) updateNistAnalysis(currentAnalysis);
+                            return;
+                        }
+                        
+                        document.getElementById('nist-quantitative-content').classList.remove('hidden');
+                        if (currentAnalysis) updateNistQuantitative(currentAnalysis);
+                    }
+                });
+            });
+            
+            // Quantitative analysis slider
+            const quantExposureSlider = document.getElementById('quant-exposure-factor');
+            const quantExposureValue = document.getElementById('quant-exposure-value');
+            
+            quantExposureSlider.addEventListener('input', function() {
+                quantExposureValue.textContent = this.value + '%';
+            });
+            
+            // Calculate quantitative risk
+            document.getElementById('calculate-quant-btn').addEventListener('click', function() {
+                if (!currentAnalysis) {
+                    showAlert('No analysis data available', 'error');
+                    return;
+                }
+                
+                const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                const assetValue = parseFloat(selectedAsset.getAttribute('data-asset-value') || '0');
+                const exposureFactor = parseFloat(quantExposureSlider.value) / 100.0;
+                const aro = parseFloat(document.getElementById('quant-aro').value) || 0.5;
+                
+                if (assetValue <= 0) {
+                    showAlert('Asset value not found in database', 'error');
+                    return;
+                }
+                
+                // Calculate SLE and ALE
+                const sle = assetValue * exposureFactor;
+                const ale = sle * aro;
+                
+                // Update results
+                document.getElementById('sle-result').textContent = formatCurrency(sle);
+                document.getElementById('ale-result').textContent = formatCurrency(ale);
+                
+                document.getElementById('result-av').textContent = formatCurrency(assetValue);
+                document.getElementById('result-ef').textContent = quantExposureSlider.value + '%';
+                document.getElementById('result-sle').textContent = formatCurrency(sle);
+                document.getElementById('result-aro').textContent = aro.toFixed(2);
+                document.getElementById('result-ale').textContent = formatCurrency(ale);
+                
+                document.getElementById('quantitative-result').classList.remove('hidden');
+                
+                // Store calculations for saving
+                window.currentQuantitativeData = {
+                    sle: sle,
+                    ale: ale,
+                    asset_value: assetValue,
+                    exposure_factor: quantExposureSlider.value,
+                    aro: aro
+                };
+                
+                showAlert('Quantitative risk calculation completed!', 'success');
+            });
+            
+            // Save NIST qualitative risk assessment
+            document.getElementById('save-nist-qual-btn').addEventListener('click', function() {
+                if (!currentAnalysis) {
+                    showAlert('No risk analysis to save', 'error');
+                    return;
+                }
+                
+                const saveBtn = this;
+                saveBtn.classList.add('loading');
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                fetch('/api/analyze-risk/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        asset_id: currentAnalysis.asset.id,
+                        vulnerability_id: currentAnalysis.vulnerability.id,
+                        title: `NIST Qualitative: ${currentAnalysis.asset.name} - ${currentAnalysis.vulnerability.name}`,
+                        description: `Automated NIST qualitative risk assessment.\nRisk Score: ${currentAnalysis.calculation.risk_score.toFixed(1)}\nRisk Level: ${currentAnalysis.calculation.risk_level}\nImpact: ${currentAnalysis.calculation.impact.toFixed(1)}\nLikelihood: ${currentAnalysis.calculation.likelihood}`,
+                        analysis_mode: 'NIST_QUALITATIVE',
+                        nist_risk_score: currentAnalysis.calculation.risk_score,
+                        nist_risk_level: currentAnalysis.calculation.risk_level,
+                        likelihood: currentAnalysis.calculation.likelihood,
+                        impact: currentAnalysis.calculation.impact,
+                        response_strategy: 'Mitigate'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'NIST qualitative risk assessment saved successfully! Risk ID: ' + data.risk_id,
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .catch(error => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    showAlert('Error saving risk assessment: ' + error.message, 'error');
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Save NIST quantitative risk assessment
+            document.getElementById('save-nist-quant-btn').addEventListener('click', function() {
+                if (!currentAnalysis || !window.currentQuantitativeData) {
+                    showAlert('Please calculate quantitative risk first', 'error');
+                    return;
+                }
+                
+                const saveBtn = this;
+                saveBtn.classList.add('loading');
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                const assetValue = window.currentQuantitativeData.asset_value;
+                const exposureFactor = window.currentQuantitativeData.exposure_factor;
+                const aro = window.currentQuantitativeData.aro;
+                const sle = window.currentQuantitativeData.sle;
+                const ale = window.currentQuantitativeData.ale;
+                
+                fetch('/api/analyze-risk/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        asset_id: currentAnalysis.asset.id,
+                        vulnerability_id: currentAnalysis.vulnerability.id,
+                        title: `NIST Quantitative: ${currentAnalysis.asset.name} - ${currentAnalysis.vulnerability.name}`,
+                        description: `Automated NIST quantitative risk assessment.\nAsset Value: $${assetValue.toLocaleString()}\nExposure Factor: ${exposureFactor}%\nARO: ${aro}\nSLE: $${sle.toLocaleString()}\nALE: $${ale.toLocaleString()}`,
+                        analysis_mode: 'NIST_QUANTITATIVE',
+                        asset_value_quant: assetValue,
+                        ef_quant: exposureFactor,
+                        aro_quant: aro,
+                        sle_quant: sle,
+                        ale_quant: ale,
+                        response_strategy: 'Mitigate'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'NIST quantitative risk assessment saved successfully! Risk ID: ' + data.risk_id,
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .catch(error => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    showAlert('Error saving risk assessment: ' + error.message, 'error');
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Save ISO risk assessment
+            document.getElementById('save-iso-risk-btn').addEventListener('click', function() {
+                if (!currentAnalysis) {
+                    showAlert('No risk analysis to save', 'error');
+                    return;
+                }
+                
+                const saveBtn = this;
+                saveBtn.classList.add('loading');
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                const isoRiskScore = parseFloat(document.getElementById('iso-risk-score').textContent.replace('$', '').replace(/,/g, '')) || 0;
+                const businessImpact = parseInt(document.getElementById('iso-final-business-impact').textContent) || 0;
+                const likelihood = parseInt(document.getElementById('iso-final-likelihood').textContent.split('(')[1]) || 3;
+                const assetValue = parseFloat(document.getElementById('iso-final-asset-value').textContent.replace('$', '').replace(/,/g, '')) || 0;
+                
+                fetch('/api/analyze-risk/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        asset_id: currentAnalysis.asset.id,
+                        vulnerability_id: currentAnalysis.vulnerability.id,
+                        title: `ISO 27005: ${currentAnalysis.asset.name} - ${currentAnalysis.vulnerability.name}`,
+                        description: `Automated ISO 27005 risk assessment.\nAsset Value: $${assetValue.toLocaleString()}\nBusiness Impact: ${businessImpact}\nLikelihood: ${likelihood}\nRisk Score: $${isoRiskScore.toLocaleString()}`,
+                        analysis_mode: 'ISO_27005',
+                        iso_risk_score: isoRiskScore,
+                        asset_value: assetValue,
+                        business_impact: businessImpact,
+                        likelihood: likelihood,
+                        response_strategy: 'Mitigate'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'ISO risk assessment saved successfully! Risk ID: ' + data.risk_id,
+                        confirmButtonText: 'OK'
+                    });
+                })
+                .catch(error => {
+                    saveBtn.classList.remove('loading');
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Assessment';
+                    showAlert('Error saving risk assessment: ' + error.message, 'error');
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Reset analysis
+            document.getElementById('reset-analysis-btn').addEventListener('click', resetAnalysis);
+            document.getElementById('iso-reset-btn').addEventListener('click', resetAnalysis);
+            
+            function resetAnalysis() {
+                assetSelect.value = '';
+                vulnerabilitySelect.value = '';
+                assetInfoCard.classList.add('hidden');
+                nistModeSelector.classList.add('hidden');
+                isoModeSelector.classList.add('hidden');
+                document.getElementById('nist-qualitative-content').classList.add('hidden');
+                document.getElementById('nist-quantitative-content').classList.add('hidden');
+                document.getElementById('iso-content').classList.add('hidden');
+                impactDisplay.classList.add('hidden');
+                currentAnalysis = null;
+                window.currentQuantitativeData = null;
+                
+                showAlert('Analysis reset. Select new asset and vulnerability to begin.', 'info');
+            }
+            
+            // Helper functions
+            function showAlert(message, type='info') {
+                const alertContainer = document.getElementById('alert-container');
+                if (!alertContainer) {
+                    Swal.fire({
+                        icon: type === 'error' ? 'error' : type === 'success' ? 'success' : 'info',
+                        title: type === 'error' ? 'Error' : type === 'success' ? 'Success' : 'Info',
+                        text: message
+                    });
+                    return;
+                }
+                
+                const alert = document.createElement('div');
+                alert.className = `alert alert-${type}`;
+                
+                let icon = 'info-circle';
+                if (type === 'success') icon = 'check-circle';
+                if (type === 'error') icon = 'exclamation-circle';
+                
+                alert.innerHTML = `
+                    <i class="fas fa-${icon}"></i>
+                    <span>${message}</span>
+                `;
+                alertContainer.appendChild(alert);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+            
+            function updateBasicAssetInfo() {
+                const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                const selectedVuln = vulnerabilitySelect.options[vulnerabilitySelect.selectedIndex];
+                
+                document.getElementById('asset-name').textContent = selectedAsset.text;
+                document.getElementById('vulnerability-name').textContent = selectedVuln.text;
+                document.getElementById('asset-type').textContent = selectedAsset.getAttribute('data-type') || '-';
+                document.getElementById('asset-owner').textContent = selectedAsset.getAttribute('data-owner') || '-';
+                
+                const assetValue = parseFloat(selectedAsset.getAttribute('data-asset-value') || '0');
+                document.getElementById('asset-value-display').textContent = formatCurrency(assetValue);
+                
+                const assetCriticality = parseInt(selectedAsset.getAttribute('data-criticality') || '3');
+                document.getElementById('criticality-level').textContent = getCriticalityLabel(assetCriticality);
+                document.getElementById('criticality-level').className = 'criticality-level level-' + getCriticalityClass(assetCriticality);
+                
+                const vulnSeverity = parseInt(selectedVuln.getAttribute('data-severity') || '3');
+                document.getElementById('severity-level').textContent = getSeverityLabel(vulnSeverity);
+                document.getElementById('severity-level').className = 'criticality-level level-' + getSeverityClass(vulnSeverity);
+                
+                const likelihood = parseInt(selectedVuln.getAttribute('data-likelihood') || '3');
+                document.getElementById('likelihood-display').textContent = getLikelihoodLabel(likelihood) + ` (${likelihood})`;
+                
+                const confidentiality = parseInt(selectedAsset.getAttribute('data-confidentiality') || '3');
+                const integrity = parseInt(selectedAsset.getAttribute('data-integrity') || '3');
+                const availability = parseInt(selectedAsset.getAttribute('data-availability') || '3');
+                
+                document.getElementById('confidentiality-value').textContent = confidentiality;
+                document.getElementById('integrity-value').textContent = integrity;
+                document.getElementById('availability-value').textContent = availability;
+                
+                const impact = (vulnSeverity * assetCriticality) / 5;
+                document.getElementById('calculated-impact').textContent = impact.toFixed(1);
+            }
+            
+            function updateAssetInfo(data) {
+                document.getElementById('asset-name').textContent = data.asset.name;
+                document.getElementById('vulnerability-name').textContent = data.vulnerability.name;
+                document.getElementById('asset-type').textContent = data.asset.type;
+                document.getElementById('asset-owner').textContent = data.asset.owner || '-';
+                
+                const assetValue = parseFloat(data.asset.asset_value || '0');
+                document.getElementById('asset-value-display').textContent = formatCurrency(assetValue);
+                
+                const assetCriticality = data.asset.criticality_value || 3;
+                document.getElementById('criticality-level').textContent = getCriticalityLabel(assetCriticality);
+                document.getElementById('criticality-level').className = 'criticality-level level-' + getCriticalityClass(assetCriticality);
+                
+                const vulnSeverity = data.vulnerability.severity_value || 3;
+                document.getElementById('severity-level').textContent = getSeverityLabel(vulnSeverity);
+                document.getElementById('severity-level').className = 'criticality-level level-' + getSeverityClass(vulnSeverity);
+                
+                const likelihood = data.calculation.likelihood || 3;
+                document.getElementById('likelihood-display').textContent = getLikelihoodLabel(likelihood) + ` (${likelihood})`;
+                
+                const confidentiality = data.asset.confidentiality || 3;
+                const integrity = data.asset.integrity || 3;
+                const availability = data.asset.availability || 3;
+                
+                document.getElementById('confidentiality-value').textContent = confidentiality;
+                document.getElementById('integrity-value').textContent = integrity;
+                document.getElementById('availability-value').textContent = availability;
+                
+                document.getElementById('calculated-impact').textContent = data.calculation.impact.toFixed(1);
+            }
+            
+            function updateNistAnalysis(data) {
+                // Update automated values display
+                document.getElementById('nist-severity-level').textContent = getSeverityLabel(data.vulnerability.severity_value);
+                document.getElementById('nist-severity-level').className = 'criticality-level level-' + getSeverityClass(data.vulnerability.severity_value);
+                document.getElementById('nist-severity-value').textContent = data.vulnerability.severity_value;
+                
+                document.getElementById('nist-criticality-level').textContent = getCriticalityLabel(data.asset.criticality_value);
+                document.getElementById('nist-criticality-level').className = 'criticality-level level-' + getCriticalityClass(data.asset.criticality_value);
+                document.getElementById('nist-criticality-value').textContent = data.asset.criticality_value;
+                
+                const likelihood = data.calculation.likelihood || 3;
+                document.getElementById('nist-likelihood-value').textContent = likelihood;
+                document.getElementById('nist-likelihood-label').textContent = getLikelihoodLabel(likelihood);
+                document.getElementById('nist-likelihood-breakdown').textContent = likelihood;
+                
+                const impact = data.calculation.impact || 0;
+                document.getElementById('nist-impact-value').textContent = impact.toFixed(1);
+                document.getElementById('nist-impact-breakdown').textContent = impact.toFixed(1);
+                
+                // Update results
+                document.getElementById('nist-risk-result').textContent = data.calculation.risk_score.toFixed(1);
+                document.getElementById('nist-risk-score').textContent = data.calculation.risk_score.toFixed(1);
+                document.getElementById('nist-risk-level-text').textContent = data.calculation.risk_level;
+                document.getElementById('nist-risk-level-badge').textContent = data.calculation.risk_level;
+                document.getElementById('nist-risk-level-badge').className = 'result-level level-' + data.calculation.risk_level.toLowerCase().replace(' ', '-');
+                
+                // Update priority
+                document.getElementById('nist-risk-priority').textContent = getRiskPriority(data.calculation.risk_score);
+                document.getElementById('nist-priority-description').textContent = getPriorityDescription(data.calculation.risk_score);
+                
+                // Update detailed formula
+                document.getElementById('nist-detailed-formula').innerHTML = `
+                    <div class="formula-text">${data.calculation.formula || 'Risk = Likelihood × (Impact × 3)'}</div>
+                `;
+                
+                // Generate risk matrix
+                if (data.risk_matrix) {
+                    generateRiskMatrix(data.risk_matrix, data.calculation.risk_score);
+                }
+            }
+            
+            function updateNistQuantitative(data) {
+                // Update asset value display
+                const assetValue = parseFloat(data.asset.asset_value || '0');
+                document.getElementById('quant-asset-value-display').textContent = formatCurrency(assetValue);
+                document.getElementById('result-av').textContent = formatCurrency(assetValue);
+                
+                // Reset quantitative result
+                document.getElementById('quantitative-result').classList.add('hidden');
+                window.currentQuantitativeData = null;
+            }
+            
+            function updateIsoAnalysis(data) {
+                // Get asset details from select element
+                const selectedAsset = assetSelect.options[assetSelect.selectedIndex];
+                const assetValue = parseFloat(selectedAsset.getAttribute('data-asset-value') || '0');
+                const confidentiality = parseInt(selectedAsset.getAttribute('data-confidentiality') || '3');
+                const integrity = parseInt(selectedAsset.getAttribute('data-integrity') || '3');
+                const availability = parseInt(selectedAsset.getAttribute('data-availability') || '3');
+                
+                // Get vulnerability details
+                const selectedVuln = vulnerabilitySelect.options[vulnerabilitySelect.selectedIndex];
+                const likelihood = parseInt(selectedVuln.getAttribute('data-likelihood') || '3');
+                
+                // Calculate business impact
+                const businessImpact = confidentiality + integrity + availability;
+                
+                // Calculate risk score
+                const riskScore = assetValue * businessImpact * likelihood;
+                
+                // Update ISO content
+                document.getElementById('iso-asset-value').textContent = formatCurrency(assetValue);
+                document.getElementById('iso-confidentiality').textContent = confidentiality;
+                document.getElementById('iso-integrity').textContent = integrity;
+                document.getElementById('iso-availability').textContent = availability;
+                document.getElementById('iso-likelihood').textContent = likelihood;
+                document.getElementById('iso-likelihood-label').textContent = getLikelihoodLabel(likelihood);
+                
+                document.getElementById('iso-calc-confidentiality').textContent = confidentiality;
+                document.getElementById('iso-calc-integrity').textContent = integrity;
+                document.getElementById('iso-calc-availability').textContent = availability;
+                document.getElementById('iso-business-impact-result').textContent = businessImpact;
+                
+                document.getElementById('iso-calc-asset-value').textContent = formatCurrency(assetValue, false);
+                document.getElementById('iso-calc-business-impact').textContent = businessImpact;
+                document.getElementById('iso-calc-likelihood').textContent = likelihood;
+                document.getElementById('iso-risk-result').textContent = formatCurrency(riskScore);
+                
+                document.getElementById('iso-final-asset-value').textContent = formatCurrency(assetValue);
+                document.getElementById('iso-final-business-impact').textContent = businessImpact;
+                document.getElementById('iso-final-likelihood').textContent = getLikelihoodLabel(likelihood) + ` (${likelihood})`;
+                document.getElementById('iso-risk-score').textContent = formatCurrency(riskScore);
+                
+                // Determine risk level based on risk score
+                const riskLevel = getIsoRiskLevel(riskScore);
+                document.getElementById('iso-risk-level').textContent = riskLevel.level;
+                document.getElementById('iso-risk-level-badge').textContent = riskLevel.level;
+                document.getElementById('iso-risk-level-badge').className = 'result-level ' + riskLevel.class;
+                
+                // Calculate financial impact (ALE) - using default values
+                const exposureFactor = 0.25; // Assume 25% exposure
+                const aro = 0.5; // Assume 0.5 occurrences per year
+                const sle = assetValue * exposureFactor;
+                const ale = sle * aro;
+                document.getElementById('iso-financial-impact').textContent = formatCurrency(ale);
+            }
+            
+            function generateRiskMatrix(matrixData, currentRiskScore) {
+                const matrixContainer = document.getElementById('risk-matrix');
+                if (!matrixContainer) return;
+                
+                matrixContainer.innerHTML = '';
+                
+                // Impact labels (15, 12, 9, 6, 3)
+                const impactLabels = [
+                    'Very High (15)', 
+                    'High (12)', 
+                    'Medium (9)', 
+                    'Low (6)', 
+                    'Very Low (3)'
+                ];
+                
+                // Likelihood labels (1 to 5)
+                const likelihoodLabels = ['Very Low (1)', 'Low (2)', 'Medium (3)', 'High (4)', 'Very High (5)'];
+                
+                // Create header row
+                matrixHTML = '<div class="matrix-header">Impact (I×3) ↓ / Likelihood →</div>';
+                
+                // Create likelihood headers
+                for (let i = 0; i < likelihoodLabels.length; i++) {
+                    matrixHTML += `<div class="matrix-likelihood-label">${likelihoodLabels[i]}</div>`;
+                }
+                
+                // Create matrix cells
+                for (let i = 0; i < matrixData.length; i++) {
+                    // Impact label
+                    matrixHTML += `<div class="matrix-impact-label">${impactLabels[i]}</div>`;
+                    
+                    // Matrix cells for this impact level
+                    for (let j = 0; j < matrixData[i].length; j++) {
+                        const cell = matrixData[i][j];
+                        const cellClass = `matrix-cell ${cell.level.toLowerCase().replace(' ', '-')}`;
+                        const isActive = cell.risk_score === Math.round(currentRiskScore);
+                        
+                        matrixHTML += `
+                            <div class="${cellClass} ${isActive ? 'active' : ''}" title="Risk Score: ${cell.risk_score}, Level: ${cell.level}">
+                                <div class="risk-score">${cell.risk_score}</div>
+                                <div class="risk-level">${cell.level}</div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                matrixContainer.innerHTML = matrixHTML;
+            }
+            
+            function getLikelihoodLabel(value) {
+                switch(value) {
+                    case 1: return 'Very Low';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Very High';
+                    default: return 'Medium';
+                }
+            }
+            
+            function getSeverityLabel(value) {
+                switch(value) {
+                    case 1: return 'Informative';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Critical';
+                    default: return 'Medium';
+                }
+            }
+            
+            function getCriticalityLabel(value) {
+                switch(value) {
+                    case 1: return 'Very Low';
+                    case 2: return 'Low';
+                    case 3: return 'Medium';
+                    case 4: return 'High';
+                    case 5: return 'Critical';
+                    default: return 'Medium';
+                }
+            }
+            
+            function getCriticalityClass(value) {
+                switch(value) {
+                    case 5: return 'critical';
+                    case 4: return 'high';
+                    case 3: return 'medium';
+                    case 2: return 'low';
+                    case 1: return 'very-low';
+                    default: return 'medium';
+                }
+            }
+            
+            function getSeverityClass(value) {
+                switch(value) {
+                    case 5: return 'critical';
+                    case 4: return 'high';
+                    case 3: return 'medium';
+                    case 2: return 'low';
+                    case 1: return 'very-low';
+                    default: return 'medium';
+                }
+            }
+            
+            function getRiskPriority(riskScore) {
+                if (riskScore >= 45) return 'P1 - Critical';
+                if (riskScore >= 30) return 'P2 - High';
+                if (riskScore >= 15) return 'P3 - Medium';
+                if (riskScore >= 9) return 'P4 - Low';
+                return 'P5 - Very Low';
+            }
+            
+            function getPriorityDescription(riskScore) {
+                if (riskScore >= 45) return 'Immediate remediation required';
+                if (riskScore >= 30) return 'Address within 1 week';
+                if (riskScore >= 15) return 'Address within 1 month';
+                if (riskScore >= 9) return 'Address in next quarter';
+                return 'Accept or monitor';
+            }
+            
+            function getIsoRiskLevel(riskScore) {
+                if (riskScore >= 1000000) return { level: 'Critical', class: 'level-critical' };
+                if (riskScore >= 500000) return { level: 'Very High', class: 'level-very-high' };
+                if (riskScore >= 100000) return { level: 'High', class: 'level-high' };
+                if (riskScore >= 50000) return { level: 'Medium', class: 'level-medium' };
+                if (riskScore >= 10000) return { level: 'Low', class: 'level-low' };
+                return { level: 'Very Low', class: 'level-very-low' };
+            }
+            
+            function formatCurrency(amount, includeSymbol = true) {
+                if (isNaN(amount)) amount = 0;
+                const formatted = amount.toLocaleString(undefined, { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+                return includeSymbol ? '$' + formatted : formatted;
+            }
+            
+            // Initialize variables
+            window.currentQuantitativeData = null;
+        });
+    </script>
+</body>
+</html>

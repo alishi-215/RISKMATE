@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Report - RiskMate</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{--pri:#1e3a5f;--sec:#2c5282;--acc:#0e9f6e;--dng:#e53e3e;--wrn:#dd6b20;--inf:#3182ce;--suc:#38a169;--lt:#f8fafc;--dk:#1e293b;--gry:#cbd5e1;--br:8px;--sh:0 4px 6px -1px rgba(0,0,0,.1);--shl:0 10px 15px -3px rgba(0,0,0,.1);--tr:all .3s ease;}
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+        body{background:linear-gradient(135deg,#f0f4f8,#e2e8f0);color:var(--dk);min-height:100vh;}
+
+        .navbar{background:var(--pri);color:#fff;padding:.7rem 2rem;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--sh);position:sticky;top:0;z-index:100;}
+        .logo{display:flex;align-items:center;gap:.7rem;}
+        .logo-icon{font-size:1.7rem;color:var(--acc);}
+        .logo-text{font-size:1.3rem;font-weight:600;}
+        .nav-links{display:flex;gap:1rem;}
+        .nav-item{display:flex;flex-direction:column;align-items:center;gap:.2rem;cursor:pointer;padding:.4rem .6rem;border-radius:var(--br);transition:var(--tr);color:#fff;text-decoration:none;font-size:.78rem;}
+        .nav-item:hover{background:rgba(255,255,255,.1);}
+        .nav-item.active{background:rgba(255,255,255,.18);}
+        .nav-item i{font-size:1.1rem;}
+        .user-profile{position:relative;cursor:pointer;}
+        .avatar{width:38px;height:38px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff;}
+        .profile-dropdown{position:absolute;top:115%;right:0;background:#fff;border-radius:var(--br);box-shadow:var(--shl);width:190px;overflow:hidden;display:none;z-index:10;}
+        .profile-dropdown.show{display:block;}
+        .dropdown-item{padding:.7rem 1rem;color:var(--dk);display:flex;align-items:center;gap:.7rem;transition:var(--tr);font-size:.85rem;}
+        .dropdown-item:hover{background:#f1f5f9;}
+        .dropdown-item i{width:18px;text-align:center;color:var(--sec);}
+
+        .footer{background:var(--pri);color:rgba(255,255,255,.7);padding:1.2rem 2rem;margin-top:2rem;}
+        .footer-content{display:flex;justify-content:space-between;align-items:center;max-width:1800px;margin:0 auto;flex-wrap:wrap;gap:.6rem;}
+        .footer-link{color:rgba(255,255,255,.6);text-decoration:none;font-size:.82rem;transition:var(--tr);}
+        .footer-link:hover{color:#fff;}
+
+        .container{max-width:1800px;margin:0 auto;padding:1.5rem 2rem;}
+        .page-title{font-size:1.8rem;font-weight:700;color:var(--pri);margin-bottom:.2rem;}
+        .page-desc{color:#64748b;font-size:.9rem;margin-bottom:1.5rem;}
+
+        .filter-box{background:#fff;border-radius:var(--br);padding:1.4rem 1.8rem;margin-bottom:1.5rem;box-shadow:var(--sh);}
+        .filter-heading{font-size:1rem;font-weight:600;color:var(--pri);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+        .filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:1rem;}
+        .filter-group{display:flex;flex-direction:column;}
+        .filter-label{font-size:.75rem;font-weight:700;color:var(--dk);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.5px;}
+        .filter-select,.filter-input{padding:.6rem .7rem;border:1px solid #e2e8f0;border-radius:var(--br);font-size:.88rem;transition:var(--tr);background:#fff;}
+        .filter-select:focus,.filter-input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(14,159,110,.1);}
+        .filter-actions{display:flex;gap:.8rem;justify-content:flex-end;padding-top:.8rem;border-top:1px solid #e2e8f0;}
+
+        .btn{padding:.6rem 1.2rem;border-radius:var(--br);border:none;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;transition:var(--tr);font-size:.88rem;}
+        .btn-primary{background:linear-gradient(90deg,var(--acc),#0c7a55);color:#fff;}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:var(--shl);}
+        .btn-secondary{background:#fff;color:var(--pri);border:1px solid var(--gry);}
+        .btn-secondary:hover{background:var(--lt);}
+
+        .summary-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;}
+        .summary-card{background:#fff;border-radius:var(--br);padding:1.1rem 1.3rem;box-shadow:var(--sh);border-left:4px solid var(--acc);transition:var(--tr);}
+        .summary-card:hover{transform:translateY(-3px);box-shadow:var(--shl);}
+        .summary-card.critical{border-left-color:var(--dng);}
+        .summary-card.high{border-left-color:var(--wrn);}
+        .summary-card.medium{border-left-color:#f59e0b;}
+        .summary-card.low{border-left-color:var(--inf);}
+        .sc-label{font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.3rem;}
+        .sc-value{font-size:2rem;font-weight:700;color:var(--pri);}
+        .sc-sub{font-size:.75rem;color:#94a3b8;margin-top:.2rem;}
+
+        .report-wrap{background:#fff;border-radius:var(--br);box-shadow:var(--sh);overflow:hidden;margin-bottom:1.5rem;}
+        .report-heading{font-size:1.15rem;font-weight:700;color:var(--pri);padding:1.3rem 1.8rem .8rem;display:flex;align-items:center;gap:.6rem;}
+        .report-heading i{color:var(--acc);}
+        .report-sub{padding:0 1.8rem .6rem;font-size:.82rem;color:#64748b;}
+        .report-scroll{overflow-x:auto;padding:0 .5rem 1rem;}
+
+        .rtable{width:100%;border-collapse:collapse;}
+        .rtable thead{position:sticky;top:0;z-index:5;}
+        .rtable th{background:var(--dk);color:#fff;padding:10px 16px;text-align:left;font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;}
+        .rtable th:first-child{width:340px;min-width:340px;}
+        .rtable td{padding:14px 16px;border-bottom:1px solid #e2e8f0;vertical-align:top;}
+        .rtable tbody tr:hover{background:#f0fdf4;}
+        .rtable tbody tr:nth-child(even){background:#fafbfc;}
+        .rtable tbody tr:nth-child(even):hover{background:#f0fdf4;}
+
+        .asset-name{font-weight:700;color:var(--pri);font-size:1rem;margin-bottom:8px;}
+        .asset-id-line{font-size:.78rem;color:#94a3b8;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+        .kv{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-bottom:1px dashed #e8ecf1;font-size:.84rem;}
+        .kv:last-child{border-bottom:none;}
+        .kv-key{color:#64748b;font-weight:600;min-width:110px;flex-shrink:0;}
+        .kv-val{color:var(--dk);font-weight:500;text-align:right;word-break:break-word;}
+        .kv-val.na{color:#c0c8d4;font-style:italic;}
+
+        .detail-stack{display:flex;flex-direction:column;gap:12px;}
+
+        .vuln-card{border-radius:var(--br);overflow:hidden;border:1px solid #e2e8f0;}
+        .vuln-card.v-critical{border-left:4px solid var(--dng);}
+        .vuln-card.v-high{border-left:4px solid var(--wrn);}
+        .vuln-card.v-medium{border-left:4px solid #f59e0b;}
+        .vuln-card.v-low{border-left:4px solid var(--inf);}
+        .vuln-card.v-info{border-left:4px solid #94a3b8;}
+
+        .vuln-head{padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+        .vuln-card.v-critical .vuln-head{background:#fef2f2;}
+        .vuln-card.v-high .vuln-head{background:#fff7ed;}
+        .vuln-card.v-medium .vuln-head{background:#fffbeb;}
+        .vuln-card.v-low .vuln-head{background:#eff6ff;}
+        .vuln-card.v-info .vuln-head{background:#f8fafc;}
+        .vuln-title{font-weight:700;font-size:.9rem;color:var(--dk);}
+        .vuln-body{padding:10px 14px;background:#fff;display:flex;flex-direction:column;gap:8px;}
+
+        .sub-section{border-radius:6px;padding:8px 12px;}
+        .sub-cve{background:#fffbeb;border:1px solid #fde68a;}
+        .sub-threat{background:#fef2f2;border:1px solid #fecaca;}
+        .sub-risk{background:#eff6ff;border:1px solid #bfdbfe;}
+        .sub-risk.r-critical{background:#fef2f2;border-color:#fecaca;}
+        .sub-risk.r-high{background:#fff7ed;border-color:#fed7aa;}
+        .sub-risk.r-medium{background:#fffbeb;border-color:#fde68a;}
+        .sub-risk.r-low{background:#f0fdf4;border-color:#bbf7d0;}
+        .sub-ctrl{background:#ecfdf5;border:1px solid #a7f3d0;}
+        .sub-treat{background:#f5f3ff;border:1px solid #c4b5fd;}
+        .sub-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+        .sub-label.cve-l{color:#92400e;}
+        .sub-label.threat-l{color:#991b1b;}
+        .sub-label.risk-l{color:#1e40af;}
+        .sub-label.ctrl-l{color:#065f46;}
+        .sub-label.treat-l{color:#5b21b6;}
+
+        .sub-kv{display:flex;gap:6px;font-size:.83rem;line-height:1.7;}
+        .sub-kv-key{color:#64748b;font-weight:600;min-width:140px;flex-shrink:0;}
+        .sub-kv-val{color:var(--dk);font-weight:500;}
+        .sub-kv-val.na{color:#c0c8d4;font-style:italic;}
+
+        .no-detail{text-align:center;padding:20px;color:#94a3b8;font-style:italic;font-size:.9rem;}
+
+        .b{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700;white-space:nowrap;}
+        .b-critical{background:rgba(220,38,38,.1);color:#dc2626;}
+        .b-high{background:rgba(249,115,22,.1);color:#f97316;}
+        .b-medium{background:rgba(234,179,8,.1);color:#ca8a04;}
+        .b-low{background:rgba(59,130,246,.1);color:#2563eb;}
+        .b-info{background:rgba(100,116,139,.1);color:#64748b;}
+        .b-ok{background:rgba(16,185,129,.1);color:#059669;}
+        .b-plan{background:rgba(234,179,8,.1);color:#ca8a04;}
+        .b-mitigate{background:rgba(14,159,110,.1);color:#0e9f6e;}
+        .b-accept{background:rgba(59,130,246,.1);color:#2563eb;}
+        .b-transfer{background:rgba(124,58,237,.1);color:#7c3aed;}
+        .b-avoid{background:rgba(239,68,68,.1);color:#ef4444;}
+        .b-type{background:#e0f2fe;color:#0369a1;}
+        .b-nist{background:#dbeafe;color:#1d4ed8;}
+        .b-iso{background:#fce7f3;color:#be185d;}
+        .b-src-ext{background:#fee2e2;color:#b91c1c;}
+        .b-src-int{background:#fef3c7;color:#92400e;}
+        .b-src-nat{background:#d1fae5;color:#065f46;}
+        .b-src-par{background:#ede9fe;color:#6d28d9;}
+
+        .export-bar{display:flex;gap:.8rem;justify-content:flex-end;padding:1rem 0;flex-wrap:wrap;}
+        .toast{position:fixed;bottom:2rem;right:2rem;background:var(--dk);color:#fff;padding:.7rem 1.3rem;border-radius:var(--br);font-size:.88rem;box-shadow:var(--shl);z-index:200;opacity:0;transform:translateY(20px);transition:var(--tr);}
+        .toast.show{opacity:1;transform:translateY(0);}
+
+        @media(max-width:1024px){.nav-links{display:none;}}
+        @media(max-width:768px){.container{padding:1rem;}.filter-grid{grid-template-columns:1fr 1fr;}.summary-cards{grid-template-columns:1fr 1fr;}.rtable th:first-child{min-width:240px;width:240px;}.page-title{font-size:1.3rem;}}
+        @media(max-width:480px){.filter-grid{grid-template-columns:1fr;}.summary-cards{grid-template-columns:1fr;}}
+        @media print{
+            body{background:#fff!important;}
+            .navbar,.footer,.filter-box,.export-bar,.toast{display:none!important;}
+            .container{padding:0;max-width:100%;}
+            .report-wrap{box-shadow:none;border:1px solid #e2e8f0;break-inside:auto;}
+            .rtable th{background:#1e293b!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+            .vuln-card,.sub-section,.vuln-head,.summary-card{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+            .rtable td{break-inside:avoid;}
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo"><div class="logo-icon"><i class="fas fa-shield-alt"></i></div><div class="logo-text">RiskMate</div></div>
+    <div class="nav-links">
+        <a href="/dashboard" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a>
+        <a href="/asset-inventory" class="nav-item"><i class="fas fa-server"></i><span>Assets</span></a>
+        <a href="/risk-register" class="nav-item"><i class="fas fa-list"></i><span>Risk Register</span></a>
+        <a href="/risk-assessment" class="nav-item"><i class="fas fa-clipboard-check"></i><span>Assessment</span></a>
+        <a href="/analyze-risk" class="nav-item"><i class="fas fa-chart-line"></i><span>Analyze</span></a>
+        <a href="/respond-to-risk" class="nav-item"><i class="fas fa-tasks"></i><span>Respond</span></a>
+        <a href="/risk-report" class="nav-item active"><i class="fas fa-file-alt"></i><span>Reports</span></a>
+    </div>
+    <div class="user-profile" onclick="this.querySelector('.profile-dropdown').classList.toggle('show')">
+        <div class="avatar">AD</div>
+        <div class="profile-dropdown">
+            <div class="dropdown-item"><i class="fas fa-user-circle"></i>Account Settings</div>
+            <div class="dropdown-item"><i class="fas fa-question-circle"></i>Help & Support</div>
+            <div class="dropdown-item"><i class="fas fa-sign-out-alt"></i>Logout</div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-title">Risk Report</div>
+    <div class="filter-box">
+        <div class="filter-heading"><i class="fas fa-filter"></i> Report Filters</div>
+        <div class="filter-grid">
+            <div class="filter-group"><label class="filter-label">Standard</label><select class="filter-select" id="fStd"><option value="">All Standards</option><option value="nist">NIST 800-30</option><option value="iso">ISO/IEC 27005</option></select></div>
+            <div class="filter-group"><label class="filter-label">Risk Level</label><select class="filter-select" id="fLvl"><option value="">All Levels</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+            <div class="filter-group"><label class="filter-label">Asset Type</label><select class="filter-select" id="fType"><option value="">All Types</option><option value="Digital">Digital</option><option value="Physical">Physical</option><option value="People">People</option><option value="Process">Process</option></select></div>
+            <div class="filter-group"><label class="filter-label">Date From</label><input type="date" class="filter-input" id="fFrom"></div>
+            <div class="filter-group"><label class="filter-label">Date To</label><input type="date" class="filter-input" id="fTo"></div>
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-secondary" onclick="resetFilters()"><i class="fas fa-redo"></i> Reset</button>
+            <button class="btn btn-primary" onclick="generateReport()"><i class="fas fa-search"></i> Generate Report</button>
+        </div>
+    </div>
+
+    <div id="summaryBox"></div>
+
+    <div class="report-wrap" id="reportWrap" style="display:none;">
+        <div class="report-heading"><i class="fas fa-layer-group"></i> Risk Exposure Report</div>
+        <div class="report-scroll">
+            <table class="rtable">
+                <thead><tr><th>Asset Information</th><th>Vulnerabilities &rarr; CVEs &rarr; Threats &rarr; Risk Scores &rarr; Controls &rarr; Treatment Plans</th></tr></thead>
+                <tbody id="tBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="export-bar" id="expBar" style="display:none;">
+        <button class="btn btn-secondary" onclick="exportJSON()"><i class="fas fa-code"></i> Export JSON</button>
+        <button class="btn btn-secondary" onclick="exportCSV()"><i class="fas fa-table"></i> Export CSV</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Print Report</button>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div style="font-size:.88rem;">RiskMate &mdash; Advanced Risk Reporting</div>
+        <div style="display:flex;gap:1.2rem;"><a href="#" class="footer-link">About</a><a href="#" class="footer-link">Privacy</a><a href="#" class="footer-link">Terms</a></div>
+        <div style="font-size:.8rem;">&copy; 2025 RiskMate. Final Year Project.</div>
+    </div>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================================
+// DYNAMIC VERSION – fetches all data from Flask backend
+// (keeps same layout, helpers, and export functions)
+// =====================================================================
+let currentReportData = [];
+
+// ---------- Helper functions (exactly as in your original) ----------
+function na(v){return(v===null||v===undefined||v==='')?'<span style="color:#c0c8d4;font-style:italic;">N/A</span>':v;}
+function naC(v){return v!==null?'$'+Number(v).toLocaleString():'<span style="color:#c0c8d4;font-style:italic;">N/A</span>';}
+function naP(v){return v!==null?v+'%':'<span style="color:#c0c8d4;font-style:italic;">N/A</span>';}
+function sc(s){if(!s)return'info';const l=s.toLowerCase();return l==='critical'?'critical':l==='high'?'high':l==='medium'?'medium':l==='low'?'low':'info';}
+function sb(s){const m={external:'b-src-ext',internal:'b-src-int',natural:'b-src-nat',partner:'b-src-par'};return`<span class="b ${m[s]||'b-info'}">${s||'unknown'}</span>`;}
+function stb(s){const m={Mitigate:'b-mitigate',Accept:'b-accept',Transfer:'b-transfer',Avoid:'b-avoid'};return`<span class="b ${m[s]||'b-info'}">${s}</span>`;}
+function stdb(s){return s.includes('NIST')?'<span class="b b-nist">NIST 800-30</span>':s.includes('ISO')?'<span class="b b-iso">ISO/IEC 27005</span>':`<span class="b b-info">${s}</span>`;}
+function csb(s){return s==='Implemented'?'<span class="b b-ok">Implemented</span>':s==='Planned'?'<span class="b b-plan">Planned</span>':'<span class="b b-info">'+s+'</span>';}
+function eb(e){return e==='Strong'?'<span class="b b-ok">Strong</span>':e==='Medium'?'<span class="b b-medium">Medium</span>':'<span class="b b-info">'+(e||'N/A')+'</span>';}
+function kv(key,val){return`<div class="kv"><span class="kv-key">${key}</span><span class="kv-val">${val}</span></div>`;}
+function skv(key,val){return`<div class="sub-kv"><span class="sub-kv-key">${key}</span><span class="sub-kv-val">${val}</span></div>`;}
+
+// ---------- Render summary cards ----------
+function renderSummary(assetsData) {
+    let totalAssets = assetsData.length;
+    let critical=0, high=0, medium=0, low=0;
+    assetsData.forEach(asset => {
+        (asset.vulns || []).forEach(vuln => {
+            (vuln.risks || []).forEach(risk => {
+                let score = risk.nist_qualitative_risk_score;
+                let lvl = 'low';
+                if (score >= 50) lvl = 'critical';
+                else if (score >= 30) lvl = 'high';
+                else if (score >= 10) lvl = 'medium';
+                if(lvl === 'critical') critical++;
+                else if(lvl === 'high') high++;
+                else if(lvl === 'medium') medium++;
+                else low++;
+            });
+        });
+    });
+    document.getElementById('summaryBox').innerHTML = `
+    <div class="summary-cards">
+        <div class="summary-card"><div class="sc-label"><i class="fas fa-server"></i> Assets</div><div class="sc-value">${totalAssets}</div><div class="sc-sub">${assetsData.reduce((s,a)=>s+(a.vulns?.length||0),0)} vulnerabilities</div></div>
+        <div class="summary-card critical"><div class="sc-label"><i class="fas fa-radiation"></i> Critical</div><div class="sc-value">${critical}</div></div>
+        <div class="summary-card high"><div class="sc-label"><i class="fas fa-exclamation-triangle"></i> High</div><div class="sc-value">${high}</div></div>
+        <div class="summary-card medium"><div class="sc-label"><i class="fas fa-minus-circle"></i> Medium</div><div class="sc-value">${medium}</div></div>
+        <div class="summary-card low"><div class="sc-label"><i class="fas fa-check-circle"></i> Low</div><div class="sc-value">${low}</div></div>
+    </div>`;
+}
+
+// ---------- Render main table ----------
+function renderTable(assetsData) {
+    const tb = document.getElementById('tBody');
+    if(!assetsData.length){
+        tb.innerHTML='<tr><td colspan="2" class="no-detail"><i class="fas fa-search" style="font-size:1.5rem;display:block;margin-bottom:.5rem;"></i>No assets match the selected filters.</td></tr>';
+        return;
+    }
+    let html = '';
+    assetsData.forEach(asset => {
+        const a = asset.asset;
+        const isD = a.asset_type === 'Digital';
+        const hasV = ['Digital','Physical'].includes(a.asset_type);
+        const nai = '<span style="color:#c0c8d4;font-style:italic;">N/A (not applicable)</span>';
+
+        // LEFT column
+        let left = `<div class="asset-name">${a.asset_name}</div>`;
+        left+=`<div class="asset-id-line">${a.asset_id} &nbsp;<span class="b b-type">${a.asset_type}</span> ${a.asset_criticality?'<span class="b b-'+sc(a.asset_criticality==='V.High'?'High':a.asset_criticality)+'">'+a.asset_criticality+'</span>':''}</div>`;
+        left+=kv('Asset ID',a.asset_id);
+        left+=kv('Asset Name',a.asset_name);
+        left+=kv('Owner',a.asset_owner);
+        left+=kv('Location',a.asset_location);
+        left+=kv('Type','<span class="b b-type">'+a.asset_type+'</span>');
+        left+=kv('Criticality',a.asset_criticality?`<span class="b b-${sc(a.asset_criticality==='V.High'?'High':a.asset_criticality)}">${a.asset_criticality}</span>`:na(''));
+        left+=kv('Confidentiality',a.confidentiality);
+        left+=kv('Integrity',a.integrity);
+        left+=kv('Availability',a.availability);
+        left+=kv('IP Address',isD?na(a.ip_address):nai);
+        left+=kv('MAC Address',isD?na(a.mac_address):nai);
+        left+=kv('Asset Value',hasV?naC(a.asset_value):nai);
+        left+=kv('Created',na(a.created_at));
+
+        // RIGHT column
+        let right = '';
+        if(!asset.vulns || asset.vulns.length===0) {
+            right = '<div class="no-detail"><i class="fas fa-check-circle" style="font-size:1.2rem;display:block;margin-bottom:.3rem;color:var(--suc);"></i>No vulnerabilities linked to this asset.</div>';
+        } else {
+            right = '<div class="detail-stack">';
+            asset.vulns.forEach(vuln => {
+                const vc = sc(vuln.severity);
+                right += `<div class="vuln-card v-${vc}">`;
+                right += `<div class="vuln-head">
+                    <i class="fas fa-bug" style="color:${vc==='critical'?'var(--dng)':vc==='high'?'var(--wrn)':vc==='medium'?'#f59e0b':'var(--inf)'}"></i>
+                    <span class="vuln-title">${vuln.vulnerability_name}</span>
+                    <span style="font-size:.75rem;color:#94a3b8;">${vuln.vulnerability_id}</span>
+                    <span class="b b-${vc}" style="margin-left:auto;">${vuln.severity||'N/A'}</span>
+                </div>`;
+                right += `<div class="vuln-body">`;
+                right += `<div style="font-size:.82rem;color:#64748b;margin-bottom:2px;">${vuln.description||''}</div>`;
+
+                // CVEs
+                if(vuln.cves && vuln.cves.length){
+                    right += `<div class="sub-section sub-cve"><div class="sub-label cve-l"><i class="fas fa-shield-virus"></i> Linked CVEs</div>`;
+                    vuln.cves.forEach((c,ci)=>{
+                        right+=skv('CVE ID',`<strong>${c.cve_id}</strong>`);
+                        right+=skv('CVE Name',c.cve_name);
+                        right+=skv('CVE Score',`<strong>${c.cve_score||'N/A'}</strong>`);
+                        right+=skv('CVE Severity',`<span class="b b-${sc(c.cve_severity)}">${c.cve_severity||'N/A'}</span>`);
+                        right+=`<div style="font-size:.78rem;color:#92400e;margin-top:2px;">${c.description}</div>`;
+                        if(ci<vuln.cves.length-1) right+=`<hr style="border:none;border-top:1px dashed #fde68a;margin:4px 0;">`;
+                    });
+                    right+=`</div>`;
+                } else {
+                    right+=`<div class="sub-section sub-cve"><div class="sub-label cve-l"><i class="fas fa-shield-virus"></i> Linked CVEs</div>${skv('—','<span class="na">No CVEs linked</span>')}</div>`;
+                }
+
+                // Threats
+                if(vuln.threats && vuln.threats.length){
+                    right+=`<div class="sub-section sub-threat"><div class="sub-label threat-l"><i class="fas fa-crosshairs"></i> Threats</div>`;
+                    vuln.threats.forEach((t,ti)=>{
+                        right+=skv('Threat ID',`<strong>${t.threat_id}</strong>`);
+                        right+=skv('Threat Name',t.threat_name);
+                        right+=skv('Source',sb(t.source));
+                        right+=skv('Motivation',sb(t.motivation));
+                        right+=`<div style="font-size:.78rem;color:#991b1b;margin-top:2px;">${t.description}</div>`;
+                        if(ti<vuln.threats.length-1) right+=`<hr style="border:none;border-top:1px dashed #fecaca;margin:4px 0;">`;
+                    });
+                    right+=`</div>`;
+                } else {
+                    right+=`<div class="sub-section sub-threat"><div class="sub-label threat-l"><i class="fas fa-crosshairs"></i> Threats</div>${skv('—','<span class="na">No threats linked</span>')}</div>`;
+                }
+
+                // Risks + Controls + Treatments
+                if(vuln.risks && vuln.risks.length){
+                    vuln.risks.forEach(risk => {
+                        let riskLevel = (()=>{
+                            let s = risk.nist_qualitative_risk_score;
+                            if(s>=50) return 'critical';
+                            if(s>=30) return 'high';
+                            if(s>=10) return 'medium';
+                            return 'low';
+                        })();
+                        let riskStd = risk.nist_qualitative_risk_score !== null ? 'NIST 800-30' : (risk.iso_27005_risk_score !== null ? 'ISO/IEC 27005' : 'Unknown');
+                        right += `<div class="sub-section sub-risk r-${riskLevel}">`;
+                        right += `<div class="sub-label risk-l"><i class="fas fa-chart-bar"></i> Risk Assessment — ${risk.risk_id} <span class="b b-${riskLevel}">${riskLevel.toUpperCase()}</span> ${stdb(riskStd)}</div>`;
+                        right += skv('Risk ID', `<strong>${risk.risk_id}</strong>`);
+                        right += skv('Standard', stdb(riskStd));
+                        right += skv('NIST Qual Score', na(risk.nist_qualitative_risk_score) + (risk.nist_qualitative_risk_score !== null ? ' / 75' : ''));
+                        right += skv('ISO Score', naC(risk.iso_27005_risk_score));
+                        right += skv('ARO', na(risk.annual_rate_of_occurrence));
+                        right += skv('EF', naP(risk.exposure_factor));
+                        right += skv('SLE', naC(risk.single_loss_expectancy));
+                        right += skv('ALE', `<strong>${naC(risk.annualized_loss_expectancy)}</strong>`);
+                        right += `</div>`;
+
+                        // Controls
+                        if(risk.controls && risk.controls.length){
+                            risk.controls.forEach(ctrl => {
+                                right += `<div class="sub-section sub-ctrl">`;
+                                right += `<div class="sub-label ctrl-l"><i class="fas fa-lock"></i> Control — ${ctrl.control_id}</div>`;
+                                right += skv('Control ID', `<strong>${ctrl.control_id}</strong>`);
+                                right += skv('Name', ctrl.name);
+                                right += skv('Type', `<span class="b b-type">${ctrl.type}</span>`);
+                                right += skv('Status', csb(ctrl.status));
+                                right += skv('Effectiveness', eb(ctrl.effectiveness));
+                                right += skv('Risk Reduction', na(ctrl.control_risk_reduction));
+                                right += `<div style="font-size:.78rem;color:#065f46;margin-top:2px;">${ctrl.description||''}</div>`;
+                                right += `</div>`;
+                            });
+                        }
+
+                        // Treatments
+                        if(risk.treatments && risk.treatments.length){
+                            risk.treatments.forEach(treat => {
+                                right += `<div class="sub-section sub-treat">`;
+                                right += `<div class="sub-label treat-l"><i class="fas fa-medkit"></i> Treatment — ${treat.treatment_id} ${stb(treat.strategy)}</div>`;
+                                right += skv('Treatment ID', `<strong>${treat.treatment_id}</strong>`);
+                                right += skv('Strategy', stb(treat.strategy));
+                                right += skv('Justification', na(treat.justification));
+                                right += skv('Approver', na(treat.approver));
+                                right += skv('Approval Date', na(treat.approval_date));
+                                right += skv('Transfer Method', na(treat.transfer_method));
+                                right += skv('Transfer Party', na(treat.transfer_party));
+                                right += skv('Transfer Details', na(treat.transfer_details));
+                                right += skv('Avoidance Plan', na(treat.avoidance_plan));
+                                right += skv('Avoidance Timeline', na(treat.avoidance_timeline));
+                                right += skv('Avoidance Impact', na(treat.avoidance_impact));
+                                right += `</div>`;
+                            });
+                        }
+                    });
+                } else {
+                    right += `<div class="sub-section sub-risk"><div class="sub-label risk-l"><i class="fas fa-chart-bar"></i> Risk Assessment</div>${skv('—','<span class="na">No risk assessed</span>')}</div>`;
+                }
+
+                right += `</div></div>`;
+            });
+            right += '</div>';
+        }
+
+        html += `<tr><td>${left}</td><td>${right}</td></tr>`;
+    });
+    tb.innerHTML = html;
+}
+
+// ---------- API call and filter handling ----------
+async function generateReport() {
+    const params = new URLSearchParams({
+        standard: document.getElementById('fStd').value,
+        risk_level: document.getElementById('fLvl').value,
+        asset_type: document.getElementById('fType').value,
+        date_from: document.getElementById('fFrom').value,
+        date_to: document.getElementById('fTo').value
+    });
+    try {
+        const response = await fetch(`/api/risk-report/data?${params.toString()}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        currentReportData = data.assets;
+        renderSummary(currentReportData);
+        renderTable(currentReportData);
+        document.getElementById('reportWrap').style.display = 'block';
+        document.getElementById('expBar').style.display = 'flex';
+        toast(`Report generated — ${currentReportData.length} assets`);
+    } catch (err) {
+        toast('Error loading report: ' + err.message);
+        console.error(err);
+    }
+}
+
+function resetFilters() {
+    ['fStd','fLvl','fType','fFrom','fTo'].forEach(id => document.getElementById(id).value = '');
+    generateReport();
+}
+
+// ---------- Export functions (copied from your original, but use currentReportData) ----------
+function exportJSON() {
+    const dataStr = JSON.stringify(currentReportData, null, 2);
+    const blob = new Blob([dataStr], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'risk-report.json';
+    a.click();
+    toast('JSON exported');
+}
+
+function exportCSV() {
+    // Reuse your original CSV export logic, adapted to currentReportData
+    let csv = 'Asset ID,Asset Name,Owner,Location,Type,Criticality,C,I,A,IP,MAC,Value,';
+    csv+='Vuln ID,Vuln Name,Severity,CVE ID,CVE Name,CVE Score,CVE Severity,';
+    csv+='Threat ID,Threat Name,Source,Motivation,';
+    csv+='Risk ID,Standard,NIST Qual,ISO Score,ARO,EF,SLE,ALE,Risk Level,';
+    csv+='Control ID,Control Name,Type,Status,Effectiveness,Risk Reduction,';
+    csv+='Treatment ID,Strategy,Justification,Approver,Date,Transfer Method,Transfer Party,Transfer Details,Avoidance Plan,Avoidance Timeline,Avoidance Impact\n';
+    currentReportData.forEach(asset => {
+        const a = asset.asset;
+        const base = [a.asset_id,`"${a.asset_name}"`,`"${a.asset_owner}"`,`"${a.asset_location}"`,a.asset_type,a.asset_criticality||'',a.confidentiality||'',a.integrity||'',a.availability||'',a.ip_address||'',a.mac_address||'',a.asset_value||''];
+        if(!asset.vulns || asset.vulns.length===0){
+            csv += base.join(',')+',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n';
+            return;
+        }
+        asset.vulns.forEach(vuln => {
+            const vb = [vuln.vulnerability_id,`"${vuln.vulnerability_name}"`,vuln.severity||''];
+            const maxI = Math.max(vuln.cves?.length||1, vuln.threats?.length||1, vuln.risks?.length||1);
+            for(let i=0;i<maxI;i++){
+                const c = vuln.cves?.[i] || {};
+                const t = vuln.threats?.[i] || {};
+                const r = vuln.risks?.[i] || {};
+                const ctrl = r.controls?.[0] || {};
+                const treat = r.treatments?.[0] || {};
+                let riskStd = r.nist_qualitative_risk_score !== null ? 'NIST 800-30' : (r.iso_27005_risk_score !== null ? 'ISO/IEC 27005' : '');
+                let riskLevel = (()=>{
+                    let s = r.nist_qualitative_risk_score;
+                    if(s>=50) return 'critical';
+                    if(s>=30) return 'high';
+                    if(s>=10) return 'medium';
+                    return 'low';
+                })();
+                csv += base.join(',')+','+vb.join(',')+',';
+                csv+=`${c.cve_id||''},"${c.cve_name||''}",${c.cve_score||''},${c.cve_severity||''},`;
+                csv+=`${t.threat_id||''},"${t.threat_name||''}",${t.source||''},${t.motivation||''},`;
+                csv+=`${r.risk_id||''},${riskStd},${r.nist_qualitative_risk_score||''},${r.iso_27005_risk_score||''},${r.annual_rate_of_occurrence||''},${r.exposure_factor||''},${r.single_loss_expectancy||''},${r.annualized_loss_expectancy||''},${riskLevel},`;
+                csv+=`${ctrl.control_id||''},"${ctrl.name||''}",${ctrl.type||''},${ctrl.status||''},${ctrl.effectiveness||''},"${(ctrl.control_risk_reduction||'').replace(/"/g,"'")}",`;
+                csv+=`${treat.treatment_id||''},${treat.strategy||''},"${treat.justification||''}",${treat.approver||''},${treat.approval_date||''},${treat.transfer_method||''},"${treat.transfer_party||''}","${(treat.transfer_details||'').replace(/"/g,"'")}","${(treat.avoidance_plan||'').replace(/"/g,"'")}","${treat.avoidance_timeline||''}","${(treat.avoidance_impact||'').replace(/"/g,"'")}"\n`;
+                if(r.controls && r.controls.length>1)
+                    for(let j=1;j<r.controls.length;j++) {
+                        const cx = r.controls[j];
+                        csv += ',,,,,,,,,,,,,,,,'+`,${r.risk_id},,,,,,,,${cx.control_id||''},"${cx.name||''}",${cx.type||''},${cx.status||''},${cx.effectiveness||''},"${(cx.control_risk_reduction||'').replace(/"/g,"'")}",,,,,,,,,,,\n`;
+                    }
+                if(r.treatments && r.treatments.length>1)
+                    for(let j=1;j<r.treatments.length;j++) {
+                        const tx = r.treatments[j];
+                        csv += ',,,,,,,,,,,,,,,,,,,,,,,,,,,'+`${tx.treatment_id||''},${tx.strategy||''},"${tx.justification||''}",${tx.approver||''},${tx.approval_date||''},${tx.transfer_method||''},"${tx.transfer_party||''}","${(tx.transfer_details||'').replace(/"/g,"'")}","${(tx.avoidance_plan||'').replace(/"/g,"'")}","${tx.avoidance_timeline||''}","${(tx.avoidance_impact||'').replace(/"/g,"'")}"\n`;
+                    }
+            }
+        });
+    });
+    const blob = new Blob([csv], {type: 'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'risk-report.csv';
+    a.click();
+    toast('CSV exported');
+}
+
+function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+window.addEventListener('DOMContentLoaded', generateReport);
+</script>
+</body>
+</html>

@@ -1,0 +1,3148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identify Vulnerabilities & Threats | NIST 800-30 Risk Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <style>
+        /* Keep all your existing CSS styles exactly as they are */
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #2c5282;
+            --accent: #0e9f6e;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --success: #38a169;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+.navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.2rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            padding: 0.5rem 0.85rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item span {
+            font-size: 0.75rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            color: var(--accent);
+        }
+
+        .user-profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 220px;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .dropdown-user-role {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-item.danger:hover {
+            background-color: #fee2e2;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        .dropdown-item.danger i {
+            color: var(--danger);
+        }
+
+
+        .container {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 0.3rem;
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0c7a55;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .assessment-container {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .asset-panel {
+            flex: 0 0 320px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .asset-search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .asset-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .asset-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .asset-type-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .badge-digital {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-physical {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-people {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-process {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .detail-value {
+            color: var(--dark);
+            text-align: right;
+        }
+
+        .cia-impact {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+
+        .cia-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .cia-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+        }
+
+        .cia-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .impact-high {
+            color: var(--danger);
+        }
+
+        .impact-medium {
+            color: var(--warning);
+        }
+
+        .impact-low {
+            color: var(--success);
+        }
+
+        .tab-container {
+            flex: 1;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            padding: 1.5rem;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .scrollable-table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+        }
+
+        .scrollable-table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .scrollable-table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .scrollable-table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .scrollable-table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .severity-critical {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+
+        .severity-high {
+            background-color: #feebc8;
+            color: #dd6b20;
+        }
+
+        .severity-medium {
+            background-color: #e6fffa;
+            color: #0e9f6e;
+        }
+
+        .severity-low {
+            background-color: #ebf8ff;
+            color: #3182ce;
+        }
+
+        .severity-informational {
+            background-color: #f7fafc;
+            color: #718096;
+        }
+
+        .action-buttons-cell {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .action-btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .action-btn-primary:hover {
+            background-color: #0c7a55;
+        }
+
+        .action-btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .action-btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .action-btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .action-btn-secondary:hover {
+            background-color: #2a4365;
+        }
+
+        .form-container {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 159, 110, 0.2);
+        }
+
+        .form-tooltip {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .form-required::after {
+            content: '*';
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        .cve-search {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cve-search-input {
+            flex: 1;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .cve-badge {
+            display: inline-block;
+            background-color: var(--info);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .alert-success {
+            background-color: rgba(56, 161, 105, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background-color: rgba(229, 62, 62, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .alert-warning {
+            background-color: rgba(221, 107, 32, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .reference-links {
+            margin-top: 0.5rem;
+        }
+
+        .reference-link {
+            display: block;
+            color: var(--info);
+            text-decoration: none;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .reference-link:hover {
+            text-decoration: underline;
+        }
+
+        .cve-info {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .cve-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .cve-info-label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .cve-info-value {
+            color: var(--dark);
+        }
+
+        .new-threat-form {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .asset-type-info {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-icon {
+            color: var(--info);
+            margin-right: 0.5rem;
+        }
+
+        .optional-field::after {
+            content: ' (Optional)';
+            color: #64748b;
+            font-weight: normal;
+        }
+
+        .import-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .import-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e2e8f0;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .step.active .step-label {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .step-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .download-template {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem;
+            background-color: #f1f5f9;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .download-icon {
+            font-size: 1.5rem;
+            color: var(--info);
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 0.6rem;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .preview-table th {
+            background-color: #f1f5f9;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+
+        .threat-library {
+            margin-bottom: 1.5rem;
+        }
+
+        .threat-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .link-vulnerabilities-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+        }
+
+        .vulnerability-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .vulnerability-item:last-child {
+            border-bottom: none;
+        }
+
+        .vulnerability-checkbox {
+            margin-right: 1rem;
+        }
+
+        .vulnerability-info {
+            flex: 1;
+        }
+
+        .vulnerability-name {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .vulnerability-description {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+         .footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* Select2 Custom Styling */
+        .select2-container--default .select2-selection--single {
+            height: 46px;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 2.5;
+            color: var(--dark);
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 44px;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 159, 110, 0.2);
+        }
+
+        .field-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .field-required {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .field-optional {
+            color: #64748b;
+        }
+
+        .json-preview-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .json-preview-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .json-preview-code {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin: 0;
+        }
+
+        .json-key {
+            color: #7dd3fc;
+        }
+
+        .json-string {
+            color: #86efac;
+        }
+
+        .json-number {
+            color: #fbbf24;
+        }
+
+        .json-boolean {
+            color: #c084fc;
+        }
+
+        .json-null {
+            color: #94a3b8;
+        }
+
+        .csv-preview-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .csv-preview-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+
+        .csv-preview-code {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .assessment-container {
+                flex-direction: column;
+            }
+            
+            .asset-panel {
+                flex: 1;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.8rem;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tab-header {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+            }
+            
+            .tab.active {
+                border-left-color: var(--accent);
+                border-bottom-color: transparent;
+            }
+            
+            .import-steps {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: flex-start;
+            }
+            
+            .import-steps::before {
+                display: none;
+            }
+            
+            .step {
+                flex-direction: row;
+                gap: 0.8rem;
+            }
+            
+            .threat-filters {
+                flex-direction: column;
+            }
+        }
+        /* ── Delete Confirmation Modal ── */
+        .confirm-modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .confirm-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .confirm-modal-box {
+            background-color: white;
+            border-radius: 16px;
+            padding: 2.5rem 2.5rem 2rem;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: translateY(-24px) scale(0.97);
+            transition: var(--transition);
+            text-align: center;
+        }
+        .confirm-modal-overlay.show .confirm-modal-box {
+            transform: translateY(0) scale(1);
+        }
+        .confirm-icon-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.4rem;
+            font-size: 2rem;
+            border: 3px solid #e53e3e;
+            color: #e53e3e;
+            background: rgba(229, 62, 62, 0.06);
+        }
+        .confirm-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.6rem;
+        }
+        .confirm-subtitle {
+            font-size: 0.97rem;
+            color: #64748b;
+            margin-bottom: 1.8rem;
+            line-height: 1.6;
+        }
+        .confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        .btn-confirm-no {
+            padding: 0.7rem 2.2rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray);
+            background: white;
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .btn-confirm-no:hover { background-color: #f1f5f9; }
+        .btn-confirm-yes {
+            padding: 0.7rem 2.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            background-color: var(--danger);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+        .btn-confirm-yes:hover { background-color: #c53030; }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="logo-text"> RiskMate </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item active" id="nav-dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/asset-inventory" class="nav-item" id="nav-asset-inventory">
+                <i class="fas fa-server"></i>
+                <span>Asset Inventory</span>
+            </a>
+            <a href="/risk-register" class="nav-item" id="nav-risk-register">
+                <i class="fas fa-list"></i>
+                <span>Risk Register</span>
+            </a>
+            <a href="/risk-assessment" class="nav-item" id="nav-risk-assessment">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Risk Assessment</span>
+            </a>
+            <a href="/analyze-risk" class="nav-item" id="nav-analyze-risk">
+                <i class="fas fa-chart-line"></i>
+                <span>Analyze Risk</span>
+            </a>
+            <a href="/respond-to-risk" class="nav-item" id="nav-respond-to-risk">
+                <i class="fas fa-tasks"></i>
+                <span>Respond to Risk</span>
+            </a>
+            <a href="/reports" class="nav-item" id="nav-reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="currentUser">Ahmed Khan</div>
+                <div class="user-role" id="currentRole">Security Engineer</div>
+            </div>
+            <div class="user-profile" onclick="toggleProfileDropdown()">
+                <div class="avatar" id="userAvatar">A</div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Ahmed Khan</div>
+                        <div class="dropdown-user-role" id="dropdownUserRole">Security Engineer</div>
+                    </div>
+                    <div class="dropdown-item" onclick="openSettingsModal()">
+                        <i class="fas fa-cog"></i>
+                        <span>Account Settings</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openHelpModal()">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help & Support</span>
+                    </div>
+                    <div class="dropdown-item danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Identify Vulnerabilities & Threats</h1>
+                <p class="page-description">Identify and document vulnerabilities and threats for the selected asset. Link them to create risk pairs.</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="uploadReportsBtn">
+                    <i class="fas fa-file-upload"></i>
+                    Upload Reports
+                </button>
+                <button class="btn btn-primary" id="saveAssessmentBtn">
+                    <i class="fas fa-check"></i>
+                    Save Assessment
+                </button>
+            </div>
+        </div>
+        
+        <!-- Alert Messages -->
+        <div id="alertContainer"></div>
+        
+        <!-- Assessment Container -->
+        <div class="assessment-container">
+            <!-- Asset Context Panel with Search -->
+            <div class="asset-panel">
+                <h3 class="panel-title">Asset Context</h3>
+                
+                <!-- Asset Search integrated in panel -->
+                <div class="asset-search-container">
+                    <div class="form-group">
+                        <label class="form-label" for="assetSearch">Select Asset</label>
+                        <select class="form-select" id="assetSearch">
+                            <option value="">-- Search or select an asset --</option>
+                            {% for asset in assets %}
+                            <option value="{{ asset.id }}">{{ asset.name }} ({{ asset.type }})</option>
+                            {% endfor %}
+                        </select>
+                        <div class="field-info">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span>Select an asset to proceed</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="asset-details">
+                    <div class="asset-name" id="assetName">No Asset Selected</div>
+                    <div class="asset-type-badge" id="assetTypeBadge">Select Asset</div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Business Criticality:</span>
+                        <span class="detail-value" id="assetCriticality">-</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Asset Owner:</span>
+                        <span class="detail-value" id="assetOwner">-</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Location:</span>
+                        <span class="detail-value" id="assetLocation">-</span>
+                    </div>
+                </div>
+                
+                <h4 class="panel-title">CIA Impact</h4>
+                <div class="cia-impact">
+                    <div class="cia-item">
+                        <div class="cia-label">Confidentiality</div>
+                        <div class="cia-value" id="confidentialityImpact">-</div>
+                    </div>
+                    <div class="cia-item">
+                        <div class="cia-label">Integrity</div>
+                        <div class="cia-value" id="integrityImpact">-</div>
+                    </div>
+                    <div class="cia-item">
+                        <div class="cia-label">Availability</div>
+                        <div class="cia-value" id="availabilityImpact">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Container -->
+            <div class="tab-container">
+                <div class="tab-header">
+                    <div class="tab active" data-tab="vulnerabilities">Vulnerabilities</div>
+                    <div class="tab" data-tab="threats">Threats</div>
+                </div>
+                
+                <!-- Vulnerabilities Tab -->
+                <div class="tab-content active" id="vulnerabilitiesTab">
+                    <h3 class="section-title">Vulnerability Identification</h3>
+                    
+                    <!-- Vulnerability List Table -->
+                    <div class="scrollable-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Severity</th>
+                                    <th>CVE ID</th>
+                                    <th>Description</th>
+                                    <th>Linked Threats</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vulnerabilitiesTableBody">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                                        No vulnerabilities added yet. Select an asset first.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Add Vulnerability Form -->
+                    <div class="form-container" id="vulnerabilityFormContainer" style="display: none;">
+                        <h4 class="section-title">Add New Vulnerability</h4>
+                        
+                        <div class="asset-type-info" id="assetTypeInfo">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span id="assetTypeMessage">CVE information is only applicable for Digital assets.</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="newVulnName">Vulnerability Name</label>
+                            <input type="text" class="form-input" id="newVulnName" placeholder="Enter vulnerability name">
+                            <div class="field-info">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span>Vulnerability name is required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="newVulnDescription">Description</label>
+                            <textarea class="form-textarea" id="newVulnDescription" placeholder="Describe the vulnerability..."></textarea>
+                            <div class="field-info">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span>Description is required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="newVulnSeverity">Severity</label>
+                                <select class="form-select" id="newVulnSeverity">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Severity is required</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label optional-field" for="newVulnCveId">CVE ID</label>
+                                <div class="cve-search">
+                                    <input type="text" class="form-input cve-search-input" id="newVulnCveId" placeholder="e.g., CVE-2021-44228">
+                                    <button type="button" class="btn btn-secondary" id="searchCveBtn">
+                                        <i class="fas fa-search"></i>
+                                        Search
+                                    </button>
+                                </div>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Optional: Only for Digital assets</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label optional-field" for="newVulnCvssScore">CVSS Score</label>
+                                <input type="number" class="form-input" id="newVulnCvssScore" min="0" max="10" step="0.1" placeholder="0.0 - 10.0">
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Optional: Only for Digital assets with CVE</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label optional-field" for="vulnThreats">Link Threats</label>
+                                <select class="form-select" id="vulnThreats">
+                                    <option value="">-- Select a Threat --</option>
+                                    {% for threat in threats %}
+                                    <option value="{{ threat.id }}">{{ threat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Optional: Link existing threats to this vulnerability</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label optional-field" for="vulnLikelihood">Likelihood</label>
+                                <select class="form-select" id="vulnLikelihood">
+                                    <option value="">-- Select Likelihood --</option>
+                                    <option value="Very Low">Very Low</option>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Very High">Very High</option>
+                                </select>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Optional: Likelihood of threat exploitation</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-primary" id="saveVulnerabilityBtn">
+                                <i class="fas fa-save"></i>
+                                Save Vulnerability
+                            </button>
+                            <button class="btn btn-secondary" id="cancelVulnerabilityBtn">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- No Asset Selected Message -->
+                    <div class="form-container" id="noAssetMessage">
+                        <div style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-server" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                            <h4 style="color: #64748b; margin-bottom: 0.5rem;">No Asset Selected</h4>
+                            <p style="color: #94a3b8;">Please select an asset from the left panel to add vulnerabilities.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Threats Tab -->
+                <div class="tab-content" id="threatsTab">
+                    <h3 class="section-title">Threat Identification</h3>
+                    
+                    <!-- Threat List Table -->
+                    <div class="scrollable-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Source</th>
+                                    <th>Motivation</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="threatsTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+                                        Loading threats...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Add Threat Form -->
+                    <div class="form-container">
+                        <h4 class="section-title">Add New Threat</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="threatName">Threat Name</label>
+                            <input type="text" class="form-input" id="threatName" placeholder="Enter threat name">
+                            <div class="field-info">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span>Threat name is required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="threatDescription">Description</label>
+                            <textarea class="form-textarea" id="threatDescription" placeholder="Describe the threat..."></textarea>
+                            <div class="field-info">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span>Description is required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="threatSource">Threat Source</label>
+                                <select class="form-select" id="threatSource">
+                                    <option value="">-- Select source --</option>
+                                    <option value="external">External</option>
+                                    <option value="internal">Internal</option>
+                                    <option value="partner">Partner</option>
+                                    <option value="natural">Natural</option>
+                                </select>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Source is required</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="threatMotivation">Threat Motivation</label>
+                                <select class="form-select" id="threatMotivation">
+                                    <option value="">-- Select motivation --</option>
+                                    <option value="financial">Financial Gain</option>
+                                    <option value="espionage">Espionage</option>
+                                    <option value="revenge">Revenge</option>
+                                    <option value="fun">Fun/Challenge</option>
+                                    <option value="ideological">Ideological</option>
+                                    <option value="accidental">Accidental</option>
+                                </select>
+                                <div class="field-info">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span>Motivation is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="saveCustomThreatBtn">
+                            <i class="fas fa-save"></i>
+                            Save Custom Threat
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                Automated Risk Analysis Framework (NIST 800-30 / ISO 27005)
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About This Project</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="footer-copyright">
+                © 2025 CyberRisk Analytics Institute
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Upload Reports Modal -->
+    <div class="modal" id="uploadReportsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-file-upload"></i> Upload Security Reports</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Select Report Type</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Upload File</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Review & Import</div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Report Type Selection -->
+                <div class="step-content" id="step1Content">
+                    <div class="download-template">
+                        <i class="fas fa-file-alt download-icon"></i>
+                        <div>
+                            <h4>Import Security Scanner Reports</h4>
+                            <p>Upload reports from security scanners to automatically import vulnerabilities.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Report Type</label>
+                        <div class="report-type-options" style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <div class="report-type-card" data-type="zap" style="flex: 1; border: 2px solid #cbd5e1; border-radius: var(--border-radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: var(--transition);">
+                                <div style="font-size: 2.5rem; color: #e53e3e; margin-bottom: 1rem;">
+                                    <i class="fas fa-bug"></i>
+                                </div>
+                                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">OWASP ZAP</h4>
+                                <p style="color: #64748b; font-size: 0.9rem;">Traditional JSON Report Format</p>
+                                <div class="supported-format" style="margin-top: 0.5rem;">JSON Format</div>
+                            </div>
+                            
+                            <div class="report-type-card" data-type="nmap" style="flex: 1; border: 2px solid #cbd5e1; border-radius: var(--border-radius); padding: 1.5rem; text-align: center; cursor: pointer; transition: var(--transition);">
+                                <div style="font-size: 2.5rem; color: #3182ce; margin-bottom: 1rem;">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Nmap</h4>
+                                <p style="color: #64748b; font-size: 0.9rem;">XML Report Format</p>
+                                <div class="supported-format" style="margin-top: 0.5rem;">XML Format</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="reportInfo" style="margin-top: 1.5rem; display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <span id="reportInfoText"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2: File Upload -->
+                <div class="step-content" id="step2Content" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label" id="uploadTitle">Upload File</label>
+                        <div class="file-upload" id="reportUploadArea">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <h4 id="uploadHeading">Drag & drop your file here</h4>
+                            <p id="uploadDescription">or click to browse</p>
+                            <input type="file" class="file-input" id="reportFileInput">
+                        </div>
+                        <div class="field-info">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span id="fileFormatInfo">File format information</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="processingOptions" style="display: none;">
+                        <label class="form-label">Processing Options</label>
+                        <div class="form-check" style="margin-bottom: 0.5rem;">
+                            <input class="form-check-input" type="checkbox" id="createMissingAssets" checked>
+                            <label class="form-check-label" for="createMissingAssets" style="color: var(--dark);">
+                                Create assets for web applications if not found (ZAP only)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="skipMissingIPs" checked>
+                            <label class="form-check-label" for="skipMissingIPs" style="color: var(--dark);">
+                                Skip IP addresses not found in assets (Nmap only)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Review & Import -->
+                <div class="step-content" id="step3Content" style="display: none;">
+                    <div id="previewContainer">
+                        <h4>Report Summary</h4>
+                        <div class="preview-table-container" style="max-height: 300px; overflow-y: auto; margin-top: 1rem;">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportPreviewBody">
+                                    <!-- Preview rows will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="progressContainer" style="display: none; margin-top: 1.5rem;">
+                        <h4>Processing Report</h4>
+                        <div style="background-color: #f1f5f9; border-radius: var(--border-radius); padding: 1rem; margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Processing...</span>
+                                <span id="progressPercent">0%</span>
+                            </div>
+                            <div style="height: 8px; background-color: #cbd5e1; border-radius: 4px; overflow: hidden;">
+                                <div id="progressBar" style="height: 100%; background-color: var(--accent); width: 0%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <div id="progressMessage" style="margin-top: 0.5rem; font-size: 0.9rem; color: #64748b;">Starting...</div>
+                        </div>
+                    </div>
+                    
+                    <div id="resultsContainer" style="display: none; margin-top: 1.5rem;">
+                        <div class="alert alert-success" id="successResults">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Report processed successfully!</span>
+                        </div>
+                        <div class="preview-table-container" style="max-height: 200px; overflow-y: auto; margin-top: 1rem;">
+                            <table class="preview-table">
+                                <thead>
+                                    <tr>
+                                        <th>Result</th>
+                                        <th>Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resultsBody">
+                                    <!-- Results will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="prevStepBtn" style="display: none;">Previous</button>
+                <button class="btn btn-secondary" id="cancelUploadBtn">Cancel</button>
+                <button class="btn btn-primary" id="nextStepBtn" disabled>Next</button>
+                <button class="btn btn-primary" id="processReportBtn" style="display: none;">Process Report</button>
+                <button class="btn btn-primary" id="doneBtn" style="display: none;">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Vulnerability Confirmation Modal -->
+    <div class="confirm-modal-overlay" id="delete-vuln-confirm-modal">
+        <div class="confirm-modal-box">
+            <div class="confirm-icon-ring">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <div class="confirm-title">Delete Vulnerability?</div>
+            <div class="confirm-subtitle">Are you sure you want to delete this vulnerability?<br>This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" id="delete-vuln-no">No</button>
+                <button class="btn-confirm-yes" id="delete-vuln-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Threat Confirmation Modal -->
+    <div class="confirm-modal-overlay" id="delete-threat-confirm-modal">
+        <div class="confirm-modal-box">
+            <div class="confirm-icon-ring">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <div class="confirm-title">Delete Threat?</div>
+            <div class="confirm-subtitle">Are you sure you want to delete this threat?<br>This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="btn-confirm-no" id="delete-threat-no">No</button>
+                <button class="btn-confirm-yes" id="delete-threat-yes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // Global variables
+        let currentAsset = null;
+        let currentAssetType = '';
+        let vulnerabilities = [];
+        let threats = [];
+        let currentReportType = null;
+        let reportFile = null;
+        let reportData = null;
+        let currentStep = 1;
+
+        // CSRF token for Flask
+        const csrfToken = "{{ csrf_token() if csrf_token else '' }}";
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for asset search
+            $('#assetSearch').select2({
+                placeholder: 'Search or select an asset',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('.asset-panel')
+            });
+
+            $('#vulnThreats').select2({
+                placeholder: 'Select threats to link',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Set active navbar item for this page
+            setActiveNavItem('nav-risk-assessment');
+
+            // Load assets and threats
+            loadAssets();
+            loadThreats();
+
+            // Event Listeners for existing functionality
+            document.querySelector('.avatar').addEventListener('click', function() {
+                document.querySelector('.profile-dropdown').classList.toggle('show');
+            });
+
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.avatar') && !e.target.closest('.profile-dropdown')) {
+                    document.querySelector('.profile-dropdown').classList.remove('show');
+                }
+            });
+
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+                });
+            });
+
+            // Asset selection
+            $('#assetSearch').on('change', function() {
+                const assetId = this.value;
+                if (assetId) {
+                    selectAsset(assetId);
+                } else {
+                    clearAssetSelection();
+                }
+            });
+
+            // Save vulnerability
+            document.getElementById('saveVulnerabilityBtn').addEventListener('click', function() {
+                saveVulnerability();
+            });
+
+            // Cancel vulnerability
+            document.getElementById('cancelVulnerabilityBtn').addEventListener('click', function() {
+                resetVulnerabilityForm();
+            });
+
+            // Search CVE
+            document.getElementById('searchCveBtn').addEventListener('click', function() {
+                const cveId = document.getElementById('newVulnCveId').value.trim();
+                if (cveId) {
+                    searchCve(cveId);
+                }
+            });
+
+            // Save threat
+            document.getElementById('saveCustomThreatBtn').addEventListener('click', function() {
+                saveThreat();
+            });
+
+            // Save assessment
+            document.getElementById('saveAssessmentBtn').addEventListener('click', function() {
+                if (!currentAsset) {
+                    showAlert('Please select an asset first', 'error');
+                    return;
+                }
+                saveAssessment();
+            });
+
+            // NEW: Upload Reports Modal Functionality
+            const uploadReportsBtn = document.getElementById('uploadReportsBtn');
+            const uploadReportsModal = document.getElementById('uploadReportsModal');
+            const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+            const prevStepBtn = document.getElementById('prevStepBtn');
+            const nextStepBtn = document.getElementById('nextStepBtn');
+            const processReportBtn = document.getElementById('processReportBtn');
+            const doneBtn = document.getElementById('doneBtn');
+            const reportTypeCards = document.querySelectorAll('.report-type-card');
+            const reportUploadArea = document.getElementById('reportUploadArea');
+            const reportFileInput = document.getElementById('reportFileInput');
+            const processingOptions = document.getElementById('processingOptions');
+
+            // Open upload modal
+            uploadReportsBtn.addEventListener('click', function() {
+                resetUploadModal();
+                uploadReportsModal.classList.add('show');
+            });
+
+            // Close upload modal
+            cancelUploadBtn.addEventListener('click', function() {
+                uploadReportsModal.classList.remove('show');
+                resetUploadModal();
+            });
+
+            uploadReportsModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    uploadReportsModal.classList.remove('show');
+                    resetUploadModal();
+                }
+            });
+
+            // Report type selection
+            reportTypeCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove active class from all cards
+                    reportTypeCards.forEach(c => {
+                        c.style.borderColor = '#cbd5e1';
+                        c.style.backgroundColor = 'white';
+                    });
+                    
+                    // Add active class to selected card
+                    this.style.borderColor = 'var(--accent)';
+                    this.style.backgroundColor = 'rgba(14, 159, 110, 0.05)';
+                    
+                    currentReportType = this.getAttribute('data-type');
+                    updateReportInfo();
+                    nextStepBtn.disabled = false;
+                });
+            });
+
+            // File upload
+            reportUploadArea.addEventListener('click', function() {
+                reportFileInput.click();
+            });
+
+            reportFileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    handleFileSelect(this.files[0]);
+                }
+            });
+
+            // Step navigation
+            prevStepBtn.addEventListener('click', function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepDisplay();
+                }
+            });
+
+            nextStepBtn.addEventListener('click', function() {
+                if (currentStep === 1 && !currentReportType) {
+                    showAlert('Please select a report type', 'error');
+                    return;
+                }
+                
+                if (currentStep === 2 && !reportFile) {
+                    showAlert('Please select a file to upload', 'error');
+                    return;
+                }
+                
+                if (currentStep < 3) {
+                    currentStep++;
+                    updateStepDisplay();
+                    
+                    if (currentStep === 3) {
+                        previewReport();
+                    }
+                }
+            });
+
+            processReportBtn.addEventListener('click', function() {
+                processReport();
+            });
+
+            doneBtn.addEventListener('click', function() {
+                uploadReportsModal.classList.remove('show');
+                resetUploadModal();
+            });
+        });
+
+        // Functions
+        function setActiveNavItem(itemId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeItem = document.getElementById(itemId);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success'}`;
+            alert.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function loadAssets() {
+            fetch('/api/ra/assets')
+                .then(response => response.json())
+                .then(data => {
+                    const assetSearch = $('#assetSearch');
+                    assetSearch.empty();
+                    assetSearch.append(new Option('Search or select an asset', ''));
+                    data.forEach(asset => {
+                        assetSearch.append(new Option(asset.name, asset.id));
+                    });
+                    assetSearch.trigger('change');
+                })
+                .catch(error => {
+                    console.error('Error loading assets:', error);
+                    showAlert('Error loading assets', 'error');
+                });
+        }
+
+        function loadThreats() {
+            fetch('/api/ra/threats')
+                .then(response => response.json())
+                .then(data => {
+                    threats = data;
+                    updateThreatsTable();
+                    
+                    const vulnThreats = $('#vulnThreats');
+                    vulnThreats.empty();
+                    data.forEach(threat => {
+                        vulnThreats.append(new Option(threat.name, threat.id));
+                    });
+                    vulnThreats.trigger('change');
+                })
+                .catch(error => {
+                    console.error('Error loading threats:', error);
+                    showAlert('Error loading threats', 'error');
+                });
+        }
+
+        function selectAsset(assetId) {
+            fetch(`/api/ra/asset/${assetId}`)
+                .then(response => response.json())
+                .then(asset => {
+                    if (asset.error) {
+                        showAlert(asset.error, 'error');
+                        return;
+                    }
+                    
+                    currentAsset = asset;
+                    currentAssetType = asset.type;
+                    updateAssetPanel();
+                    updateUIForAssetType();
+                    loadVulnerabilities(assetId);
+                    
+                    document.getElementById('vulnerabilityFormContainer').style.display = 'block';
+                    document.getElementById('noAssetMessage').style.display = 'none';
+                    
+                    showAlert(`Asset "${asset.name}" selected successfully`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error loading asset:', error);
+                    showAlert('Error loading asset details', 'error');
+                });
+        }
+
+        function clearAssetSelection() {
+            currentAsset = null;
+            currentAssetType = '';
+            vulnerabilities = [];
+            
+            document.getElementById('assetName').textContent = 'No Asset Selected';
+            document.getElementById('assetTypeBadge').textContent = 'Select Asset';
+            document.getElementById('assetTypeBadge').className = 'asset-type-badge';
+            document.getElementById('assetCriticality').textContent = '-';
+            document.getElementById('assetOwner').textContent = '-';
+            document.getElementById('assetLocation').textContent = '-';
+            document.getElementById('confidentialityImpact').textContent = '-';
+            document.getElementById('integrityImpact').textContent = '-';
+            document.getElementById('availabilityImpact').textContent = '-';
+            
+            document.getElementById('vulnerabilityFormContainer').style.display = 'none';
+            document.getElementById('noAssetMessage').style.display = 'block';
+            
+            document.getElementById('vulnerabilitiesTableBody').innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                        No vulnerabilities added yet. Select an asset first.
+                    </td>
+                </tr>
+            `;
+            
+            resetVulnerabilityForm();
+        }
+
+        function updateAssetPanel() {
+            if (!currentAsset) return;
+            
+            document.getElementById('assetName').textContent = currentAsset.name;
+            
+            const badge = document.getElementById('assetTypeBadge');
+            badge.textContent = currentAsset.type + ' Asset';
+            badge.className = 'asset-type-badge badge-' + currentAsset.type.toLowerCase();
+            
+            document.getElementById('assetCriticality').textContent = currentAsset.business_criticality;
+            document.getElementById('assetOwner').textContent = currentAsset.owner;
+            document.getElementById('assetLocation').textContent = currentAsset.location;
+            
+            const confImpact = document.getElementById('confidentialityImpact');
+            const intImpact = document.getElementById('integrityImpact');
+            const availImpact = document.getElementById('availabilityImpact');
+            
+            confImpact.textContent = currentAsset.confidentiality_impact;
+            intImpact.textContent = currentAsset.integrity_impact;
+            availImpact.textContent = currentAsset.availability_impact;
+            
+            applyImpactColor(confImpact, currentAsset.confidentiality_impact);
+            applyImpactColor(intImpact, currentAsset.integrity_impact);
+            applyImpactColor(availImpact, currentAsset.availability_impact);
+        }
+
+        function applyImpactColor(element, impact) {
+            element.className = 'cia-value';
+            if (impact === 'Very High' || impact === 'High') {
+                element.classList.add('impact-high');
+            } else if (impact === 'Medium') {
+                element.classList.add('impact-medium');
+            } else if (impact === 'Low' || impact === 'Very Low') {
+                element.classList.add('impact-low');
+            }
+        }
+
+        function updateUIForAssetType() {
+            const assetTypeMessage = document.getElementById('assetTypeMessage');
+            const cveIdField = document.getElementById('newVulnCveId');
+            const cvssScoreField = document.getElementById('newVulnCvssScore');
+            
+            if (currentAssetType === 'Digital') {
+                assetTypeMessage.textContent = 'CVE information is applicable for Digital assets.';
+                cveIdField.disabled = false;
+                cvssScoreField.disabled = false;
+            } else {
+                assetTypeMessage.textContent = 'CVE information is only applicable for Digital assets.';
+                cveIdField.disabled = true;
+                cveIdField.value = '';
+                cvssScoreField.disabled = true;
+                cvssScoreField.value = '';
+            }
+        }
+
+        function loadVulnerabilities(assetId) {
+            fetch(`/api/ra/asset/${assetId}/vulnerabilities`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    vulnerabilities = data;
+                    updateVulnerabilitiesTable();
+                })
+                .catch(error => {
+                    console.error('Error loading vulnerabilities:', error);
+                    showAlert('Error loading vulnerabilities', 'error');
+                });
+        }
+
+        function updateVulnerabilitiesTable() {
+            const tbody = document.getElementById('vulnerabilitiesTableBody');
+            tbody.innerHTML = '';
+            
+            if (vulnerabilities.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: #64748b;">
+                            No vulnerabilities found. Add your first vulnerability.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            vulnerabilities.forEach(vuln => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${vuln.name}</td>
+                    <td><span class="severity-badge severity-${vuln.severity.toLowerCase()}">${vuln.severity}</span></td>
+                    <td>${vuln.cve_ids || 'None'}</td>
+                    <td>${vuln.description.length > 100 ? vuln.description.substring(0, 100) + '...' : vuln.description}</td>
+                    <td>${vuln.linked_threats || 'None'}</td>
+                    <td class="action-buttons-cell">
+                        <button class="action-btn action-btn-primary edit-vulnerability" data-id="${vuln.id}">
+                            <i class="fas fa-edit"></i>
+                            Edit
+                        </button>
+                        <button class="action-btn action-btn-danger delete-vulnerability" data-id="${vuln.id}">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+
+            document.querySelectorAll('.edit-vulnerability').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    editVulnerability(id);
+                });
+            });
+
+            document.querySelectorAll('.delete-vulnerability').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteVulnerability(id);
+                });
+            });
+        }
+
+        function updateThreatsTable() {
+            const tbody = document.getElementById('threatsTableBody');
+            tbody.innerHTML = '';
+            
+            if (threats.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+                            No threats found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            threats.forEach(threat => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${threat.name}</td>
+                    <td>${threat.source}</td>
+                    <td>${threat.motivation}</td>
+                    <td>${threat.description.length > 100 ? threat.description.substring(0, 100) + '...' : threat.description}</td>
+                    <td class="action-buttons-cell">
+                        <button class="action-btn action-btn-danger delete-threat" data-id="${threat.id}">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+
+            document.querySelectorAll('.delete-threat').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.getAttribute('data-id');
+                    deleteThreat(id);
+                });
+            });
+        }
+
+        function saveVulnerability() {
+            if (!currentAsset) {
+                showAlert('Please select an asset first', 'error');
+                return;
+            }
+            
+            const name = document.getElementById('newVulnName').value.trim();
+            const description = document.getElementById('newVulnDescription').value.trim();
+            const severity = document.getElementById('newVulnSeverity').value;
+            const cveId = document.getElementById('newVulnCveId').value.trim();
+            const cvssScoreValue = document.getElementById('newVulnCvssScore').value.trim();
+            const likelihoodValue = document.getElementById('vulnLikelihood').value;
+            
+            // Get selected threat IDs (threat IDs are strings like "Threat_01")
+            const selectedThreatIds = Array.from(document.getElementById('vulnThreats').selectedOptions)
+                .map(opt => (opt.value || '').trim())
+                .filter(id => id !== '');
+            
+            if (!name || !severity) {
+                showAlert('Vulnerability name and severity are required', 'error');
+                return;
+            }
+            
+            // Convert empty strings to null for optional numeric fields
+            const cvssScore = cvssScoreValue ? parseFloat(cvssScoreValue) : null;
+            
+            const vulnerabilityData = {
+                asset_id: currentAsset.id,
+                name: name,
+                description: description || '',
+                severity: severity,
+                cve_id: cveId || null,
+                cvss_score: cvssScore,
+                likelihood: likelihoodValue || null,
+                linked_threat_ids: selectedThreatIds
+            };
+            
+            // Determine if this is an update or create
+            const isUpdate = editingVulnerabilityId && editingVulnerabilityId !== '';
+            const endpoint = isUpdate ? `/api/ra/vulnerabilities/${editingVulnerabilityId}/update` : '/api/ra/vulnerabilities/save';
+            
+            if (isUpdate) {
+                vulnerabilityData.vulnerability_id = editingVulnerabilityId;
+            }
+            
+            fetch(endpoint, {
+                method: isUpdate ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(vulnerabilityData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const message = isUpdate ? 'Vulnerability updated successfully' : 'Vulnerability saved successfully';
+                    showAlert(message, 'success');
+                    loadVulnerabilities(currentAsset.id);
+                    resetVulnerabilityForm();
+                } else {
+                    showAlert(data.error || 'Error saving vulnerability', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving vulnerability:', error);
+                showAlert('Error saving vulnerability', 'error');
+            });
+        }
+
+        function editVulnerability(vulnId) {
+            const vuln = vulnerabilities.find(v => v.id === vulnId || v.id === parseInt(vulnId));
+            if (!vuln) {
+                console.error('Vulnerability not found:', vulnId);
+                console.log('Available vulnerabilities:', vulnerabilities);
+                return;
+            }
+            
+            editingVulnerabilityId = vulnId;
+            
+            // Populate form fields
+            document.getElementById('newVulnName').value = vuln.name || '';
+            document.getElementById('newVulnDescription').value = vuln.description || '';
+            document.getElementById('newVulnSeverity').value = vuln.severity || 'Medium';
+            document.getElementById('newVulnCveId').value = vuln.cve_ids || vuln.cve_id || '';
+            document.getElementById('newVulnCvssScore').value = vuln.cvss_score || '';
+            
+            // Set threats if available - properly populate threat select
+            if (vuln.linked_threats && vuln.linked_threats !== 'None') {
+                // Parse threat names and find matching threat IDs
+                const threatNames = vuln.linked_threats.split(', ').map(t => t.trim());
+                const threatSelect = document.getElementById('vulnThreats');
+                const selectedThreatIds = [];
+                
+                threatNames.forEach(threatName => {
+                    const matchingThreat = threats.find(t => t.name === threatName);
+                    if (matchingThreat) {
+                        selectedThreatIds.push(matchingThreat.id);
+                    }
+                });
+                
+                // Set the selected values
+                $('#vulnThreats').val(selectedThreatIds).trigger('change');
+            } else {
+                $('#vulnThreats').val(null).trigger('change');
+            }
+            
+            // Update button text and styling
+            document.getElementById('saveVulnerabilityBtn').innerHTML = '<i class="fas fa-check"></i> Update Vulnerability';
+            document.getElementById('saveVulnerabilityBtn').classList.add('editing-mode');
+            
+            // Show the form
+            document.getElementById('vulnerabilityFormContainer').style.display = 'block';
+            document.getElementById('noAssetMessage').style.display = 'none';
+            
+            // Scroll to form
+            setTimeout(() => {
+                document.getElementById('vulnerabilityFormContainer').scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function resetVulnerabilityForm() {
+            document.getElementById('newVulnName').value = '';
+            document.getElementById('newVulnDescription').value = '';
+            document.getElementById('newVulnSeverity').value = 'Medium';
+            document.getElementById('newVulnCveId').value = '';
+            document.getElementById('newVulnCvssScore').value = '';
+            document.getElementById('vulnThreats').value = '';
+            document.getElementById('vulnLikelihood').value = '';
+            const saveBtn = document.getElementById('saveVulnerabilityBtn');
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Vulnerability';
+            saveBtn.classList.remove('editing-mode');
+            editingVulnerabilityId = null;
+            $('#vulnThreats').val(null).trigger('change');
+        }
+
+        function searchCve(cveId) {
+            fetch(`/api/cve-search?cve_id=${cveId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert(data.error, 'error');
+                        return;
+                    }
+                    
+                    document.getElementById('newVulnCvssScore').value = data.cvss_score || '';
+                    
+                    if (data.cvss_score) {
+                        const score = parseFloat(data.cvss_score);
+                        let severity = 'Low';
+                        if (score >= 9.0) severity = 'Critical';
+                        else if (score >= 7.0) severity = 'High';
+                        else if (score >= 4.0) severity = 'Medium';
+                        document.getElementById('newVulnSeverity').value = severity;
+                    }
+                    
+                    showAlert(`CVE ${cveId} information loaded`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error searching CVE:', error);
+                    showAlert('Error searching CVE', 'error');
+                });
+        }
+
+        function saveThreat() {
+            const name = document.getElementById('threatName').value.trim();
+            const description = document.getElementById('threatDescription').value.trim();
+            const source = document.getElementById('threatSource').value;
+            const motivation = document.getElementById('threatMotivation').value;
+            
+            if (!name || !description || !source || !motivation) {
+                showAlert('All threat fields are required', 'error');
+                return;
+            }
+            
+            const threatData = {
+                name: name,
+                description: description,
+                source: source,
+                motivation: motivation
+            };
+            
+            fetch('/api/ra/threats/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                   'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(threatData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Threat saved successfully', 'success');
+                    loadThreats();
+                    document.getElementById('threatName').value = '';
+                    document.getElementById('threatDescription').value = '';
+                    document.getElementById('threatSource').value = '';
+                    document.getElementById('threatMotivation').value = '';
+                } else {
+                    showAlert(data.error || 'Error saving threat', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving threat:', error);
+                showAlert('Error saving threat', 'error');
+            });
+        }
+
+        // ── Custom Delete Modals Setup ──
+        let pendingDeleteVulnId = null;
+        let pendingDeleteThreatId = null;
+
+        const deleteVulnModal   = document.getElementById('delete-vuln-confirm-modal');
+        const deleteThreatModal = document.getElementById('delete-threat-confirm-modal');
+
+        document.getElementById('delete-vuln-no').addEventListener('click', () => {
+            deleteVulnModal.classList.remove('show');
+            pendingDeleteVulnId = null;
+        });
+        deleteVulnModal.addEventListener('click', (e) => {
+            if (e.target === deleteVulnModal) {
+                deleteVulnModal.classList.remove('show');
+                pendingDeleteVulnId = null;
+            }
+        });
+        document.getElementById('delete-vuln-yes').addEventListener('click', () => {
+            deleteVulnModal.classList.remove('show');
+            if (pendingDeleteVulnId !== null) _doDeleteVulnerability(pendingDeleteVulnId);
+            pendingDeleteVulnId = null;
+        });
+
+        document.getElementById('delete-threat-no').addEventListener('click', () => {
+            deleteThreatModal.classList.remove('show');
+            pendingDeleteThreatId = null;
+        });
+        deleteThreatModal.addEventListener('click', (e) => {
+            if (e.target === deleteThreatModal) {
+                deleteThreatModal.classList.remove('show');
+                pendingDeleteThreatId = null;
+            }
+        });
+        document.getElementById('delete-threat-yes').addEventListener('click', () => {
+            deleteThreatModal.classList.remove('show');
+            if (pendingDeleteThreatId !== null) _doDeleteThreat(pendingDeleteThreatId);
+            pendingDeleteThreatId = null;
+        });
+
+        function deleteVulnerability(id) {
+            pendingDeleteVulnId = id;
+            deleteVulnModal.classList.add('show');
+        }
+
+        function _doDeleteVulnerability(id) {
+            fetch(`/api/ra/vulnerabilities/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Vulnerability deleted successfully', 'success');
+                    loadVulnerabilities(currentAsset.id);
+                } else {
+                    showAlert(data.error || 'Error deleting vulnerability', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting vulnerability:', error);
+                showAlert('Error deleting vulnerability', 'error');
+            });
+        }
+
+        function deleteThreat(id) {
+            pendingDeleteThreatId = id;
+            deleteThreatModal.classList.add('show');
+        }
+
+        function _doDeleteThreat(id) {
+            fetch(`/api/ra/threats/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Threat deleted successfully', 'success');
+                    loadThreats();
+                } else {
+                    showAlert(data.error || 'Error deleting threat', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting threat:', error);
+                showAlert('Error deleting threat', 'error');
+            });
+        }
+
+        function saveAssessment() {
+            const assessmentData = {
+                asset_id: currentAsset.id,
+                timestamp: new Date().toISOString()
+            };
+            
+            fetch('/api/ra/assessment/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(assessmentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Assessment saved successfully', 'success');
+                } else {
+                    showAlert(data.error || 'Error saving assessment', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving assessment:', error);
+                showAlert('Error saving assessment', 'error');
+            });
+        }
+
+        // NEW: Report Upload Functions
+        function updateReportInfo() {
+            const reportInfo = document.getElementById('reportInfo');
+            const reportInfoText = document.getElementById('reportInfoText');
+            const fileFormatInfo = document.getElementById('fileFormatInfo');
+            
+            reportInfo.style.display = 'block';
+            processingOptions.style.display = 'block';
+            
+            if (currentReportType === 'zap') {
+                reportInfoText.textContent = 'Upload OWASP ZAP Traditional JSON Report. Each alert will be processed as a vulnerability. Assets will be created as "Web App (host)" where host is defined in the report.';
+                fileFormatInfo.textContent = 'Accepted format: JSON file (.json) exported from OWASP ZAP';
+                document.getElementById('createMissingAssets').style.display = 'block';
+                document.getElementById('skipMissingIPs').style.display = 'none';
+            } else if (currentReportType === 'nmap') {
+                reportInfoText.textContent = 'Upload Nmap XML Report. Vulnerabilities will be mapped to existing assets by IP address. CVE details will be fetched from NVD API automatically.';
+                fileFormatInfo.textContent = 'Accepted format: XML file (.xml) exported from Nmap using -oX flag';
+                document.getElementById('createMissingAssets').style.display = 'none';
+                document.getElementById('skipMissingIPs').style.display = 'block';
+            }
+        }
+
+        function handleFileSelect(file) {
+            reportFile = file;
+            
+            // Validate file type
+            const validExtensions = currentReportType === 'zap' ? ['.json'] : ['.xml'];
+            const fileExt = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            
+            if (!validExtensions.includes(fileExt)) {
+                showAlert(`Invalid file type. Please upload a ${validExtensions.join(' or ')} file.`, 'error');
+                reportFile = null;
+                return;
+            }
+            
+            // Update upload area display
+            reportUploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-check-circle" style="color: var(--accent);"></i>
+                </div>
+                <h4>${file.name}</h4>
+                <p>File selected successfully</p>
+                <p style="font-size: 0.9rem; color: #64748b;">${formatFileSize(file.size)}</p>
+            `;
+            
+            // Enable next step
+            nextStepBtn.disabled = false;
+            
+            // Read file for preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (currentReportType === 'zap') {
+                    try {
+                        reportData = JSON.parse(e.target.result);
+                    } catch (error) {
+                        showAlert('Invalid JSON file', 'error');
+                        reportFile = null;
+                        reportData = null;
+                        resetUploadArea();
+                    }
+                } else {
+                    reportData = e.target.result;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function resetUploadArea() {
+            reportUploadArea.innerHTML = `
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <h4 id="uploadHeading">Drag & drop your file here</h4>
+                <p id="uploadDescription">or click to browse</p>
+                <input type="file" class="file-input" id="reportFileInput">
+            `;
+        }
+
+        function updateStepDisplay() {
+            // Update step indicators
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+                const stepNum = parseInt(step.getAttribute('data-step'));
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Show/hide step content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            document.getElementById(`step${currentStep}Content`).style.display = 'block';
+            
+            // Update buttons
+            prevStepBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+            
+            if (currentStep < 3) {
+                nextStepBtn.style.display = 'inline-block';
+                processReportBtn.style.display = 'none';
+                doneBtn.style.display = 'none';
+                nextStepBtn.disabled = (currentStep === 1 && !currentReportType) || (currentStep === 2 && !reportFile);
+            } else if (currentStep === 3) {
+                nextStepBtn.style.display = 'none';
+                processReportBtn.style.display = 'inline-block';
+                doneBtn.style.display = 'none';
+                processReportBtn.disabled = false;
+            }
+        }
+
+        function previewReport() {
+            const previewBody = document.getElementById('reportPreviewBody');
+            previewBody.innerHTML = '';
+            
+            if (currentReportType === 'zap' && reportData) {
+                const sites = reportData.site || [];
+                const alerts = sites.reduce((total, site) => {
+                    const siteAlerts = site.alerts || [];
+                    return total + siteAlerts.length;
+                }, 0);
+                
+                const previewRows = [
+                    ['Report Type', 'OWASP ZAP'],
+                    ['File Name', reportFile.name],
+                    ['File Size', formatFileSize(reportFile.size)],
+                    ['Sites Found', sites.length],
+                    ['Total Alerts', alerts],
+                    ['Asset Creation', document.getElementById('createMissingAssets').checked ? 'Enabled' : 'Disabled']
+                ];
+                
+                previewRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+                    previewBody.appendChild(tr);
+                });
+            } else if (currentReportType === 'nmap' && reportData) {
+                const previewRows = [
+                    ['Report Type', 'Nmap XML'],
+                    ['File Name', reportFile.name],
+                    ['File Size', formatFileSize(reportFile.size)],
+                    ['Missing IPs', document.getElementById('skipMissingIPs').checked ? 'Will be skipped' : 'Will show error']
+                ];
+                
+                previewRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+                    previewBody.appendChild(tr);
+                });
+            }
+        }
+
+        function processReport() {
+            const progressContainer = document.getElementById('progressContainer');
+            const previewContainer = document.getElementById('previewContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const progressMessage = document.getElementById('progressMessage');
+            
+            // Show progress, hide preview
+            previewContainer.style.display = 'none';
+            progressContainer.style.display = 'block';
+            
+            // Disable process button
+            processReportBtn.disabled = true;
+            processReportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Update progress
+            progressBar.style.width = '10%';
+            progressPercent.textContent = '10%';
+            progressMessage.textContent = 'Uploading report...';
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('file', reportFile);
+            formData.append('report_type', currentReportType);
+            
+            if (currentReportType === 'zap') {
+                formData.append('create_missing_assets', document.getElementById('createMissingAssets').checked);
+            } else if (currentReportType === 'nmap') {
+                formData.append('skip_missing_ips', document.getElementById('skipMissingIPs').checked);
+            }
+            
+            // Determine endpoint
+            const endpoint = currentReportType === 'zap' ? '/api/ra/process-zap' : '/api/ra/process-nmap';
+            
+            // Send request
+            fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update progress to 100%
+                progressBar.style.width = '100%';
+                progressPercent.textContent = '100%';
+                progressMessage.textContent = 'Report processed successfully!';
+                
+                // Show results
+                setTimeout(() => {
+                    showResults(data);
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Error processing report:', error);
+                progressMessage.textContent = `Error: ${error.message}`;
+                progressBar.style.backgroundColor = 'var(--danger)';
+                
+                // Re-enable process button
+                processReportBtn.disabled = false;
+                processReportBtn.innerHTML = '<i class="fas fa-redo"></i> Try Again';
+            });
+        }
+
+        function showResults(data) {
+            const progressContainer = document.getElementById('progressContainer');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsBody = document.getElementById('resultsBody');
+            const successResults = document.getElementById('successResults');
+            
+            // Hide progress, show results
+            progressContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            // Update buttons
+            processReportBtn.style.display = 'none';
+            doneBtn.style.display = 'inline-block';
+            
+            // Populate results table
+            resultsBody.innerHTML = '';
+            
+            if (currentReportType === 'zap') {
+                const resultRows = [
+                    ['Assets Created', data.assets_created || 0],
+                    ['Vulnerabilities Added', data.vulnerabilities_added || 0],
+                    ['Status', 'Success']
+                ];
+                
+                resultRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+                    resultsBody.appendChild(tr);
+                });
+                
+                if (data.missing_hosts && data.missing_hosts.length > 0) {
+                    successResults.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <span>ZAP report processed with ${data.missing_hosts.length} missing hosts</span>
+                    `;
+                }
+            } else if (currentReportType === 'nmap') {
+                const resultRows = [
+                    ['Vulnerabilities Added', data.vulnerabilities_added || data.imported_count || 0],
+                    ['Assets Created', data.assets_created_count || 0],
+                    ['Missing IPs', data.missing_ips ? data.missing_ips.length : 0],
+                    ['Status', 'Success']
+                ];
+                
+                resultRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row[0]}</td><td>${row[1]}</td>`;
+                    resultsBody.appendChild(tr);
+                });
+                
+                let successMessage = 'Nmap report processed successfully.';
+                let alertClass = 'alert alert-success';
+                
+                if (data.created_assets && data.created_assets.length > 0) {
+                    successMessage += ` Created ${data.created_assets.length} new asset(s):`;
+                    successMessage += ' ' + data.created_assets.map(a => `${a.asset_name} (${a.ip})`).join(', ');
+                }
+                
+                if (data.missing_ips && data.missing_ips.length > 0) {
+                    if (data.created_assets && data.created_assets.length > 0) {
+                        successMessage += ` Still ${data.missing_ips.length} IP(s) without assets.`;
+                        alertClass = 'alert alert-info';
+                    } else {
+                        successMessage = `Nmap report processed. ${data.missing_ips.length} IP addresses not found in assets and had no vulnerabilities.`;
+                        alertClass = 'alert alert-warning';
+                    }
+                }
+                
+                successResults.innerHTML = `
+                    <i class="fas fa-${alertClass.includes('success') ? 'check-circle' : alertClass.includes('info') ? 'info-circle' : 'exclamation-triangle'}"></i>
+                    <span>${successMessage}</span>
+                `;
+                successResults.className = alertClass;
+            }
+            
+            // Refresh vulnerabilities if we have a current asset
+            if (currentAsset) {
+                loadVulnerabilities(currentAsset.id);
+            }
+        }
+
+        function resetUploadModal() {
+            currentStep = 1;
+            currentReportType = null;
+            reportFile = null;
+            reportData = null;
+            
+            // Reset UI
+            document.querySelectorAll('.report-type-card').forEach(card => {
+                card.style.borderColor = '#cbd5e1';
+                card.style.backgroundColor = 'white';
+            });
+            
+            resetUploadArea();
+            document.getElementById('reportInfo').style.display = 'none';
+            document.getElementById('processingOptions').style.display = 'none';
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            // Reset steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            document.querySelector('.step[data-step="1"]').classList.add('active');
+            
+            // Show step 1 content
+            document.querySelectorAll('.step-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.getElementById('step1Content').style.display = 'block';
+            
+            // Reset buttons
+            prevStepBtn.style.display = 'none';
+            nextStepBtn.style.display = 'inline-block';
+            processReportBtn.style.display = 'none';
+            doneBtn.style.display = 'none';
+            nextStepBtn.disabled = true;
+            processReportBtn.disabled = false;
+            processReportBtn.innerHTML = 'Process Report';
+        }
+    </script>
+</body>
+</html>

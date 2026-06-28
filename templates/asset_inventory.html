@@ -1,0 +1,3642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIST 800-30 Asset Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a3a5f;
+            --secondary: #2c5282;
+            --accent: #0e9f6e;
+            --danger: #e53e3e;
+            --warning: #dd6b20;
+            --info: #3182ce;
+            --success: #38a169;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header and Navigation */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            min-height: 70px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.2rem;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            cursor: pointer;
+            padding: 0.5rem 0.85rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.18);
+            color: white;
+        }
+
+        .nav-item i {
+            font-size: 1.25rem;
+        }
+
+        .nav-item span {
+            font-size: 0.75rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            color: var(--accent);
+        }
+
+        .user-profile {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 220px;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .dropdown-user-name {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .dropdown-user-role {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .dropdown-item {
+            padding: 0.8rem 1rem;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .dropdown-item.danger:hover {
+            background-color: #fee2e2;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--secondary);
+        }
+
+        .dropdown-item.danger i {
+            color: var(--danger);
+        }
+
+        .container {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .page-description {
+            color: #64748b;
+            margin-top: 0.3rem;
+            font-size: 1rem;
+            max-width: 600px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0c7a55;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--primary);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        .btn-info {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #2f855a;
+        }
+
+        /* Filters and Search */
+        .filters-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.8rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            white-space: nowrap;
+        }
+
+        .filter-select {
+            padding: 0.7rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            background-color: white;
+            min-width: 120px;
+        }
+
+        /* Asset Table */
+        .table-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .table-summary {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .asset-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .asset-table th {
+            background-color: #f1f5f9;
+            text-align: left;
+            padding: 0.8rem 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .asset-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .asset-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .asset-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        #subnetInventoryTable tbody tr {
+            cursor: pointer;
+        }
+
+        #subnetInventoryTable tbody tr.selected-subnet-row {
+            background-color: #dbeafe;
+        }
+
+        #subnetInventoryTable tbody tr.selected-subnet-row:hover {
+            background-color: #bfdbfe;
+        }
+
+        .asset-type {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .type-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .type-digital { background-color: rgba(49, 130, 206, 0.15); color: var(--info); }
+        .type-physical { background-color: rgba(221, 107, 32, 0.15); color: var(--warning); }
+        .type-people { background-color: rgba(14, 159, 110, 0.15); color: var(--accent); }
+        .type-process { background-color: rgba(100, 116, 139, 0.15); color: #64748b; }
+
+        .criticality-level {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .level-very-high { background-color: rgba(229, 62, 62, 0.15); color: var(--danger); }
+        .level-high { background-color: rgba(221, 107, 32, 0.15); color: var(--warning); }
+        .level-medium { background-color: rgba(49, 130, 206, 0.15); color: var(--info); }
+        .level-low { background-color: rgba(56, 161, 105, 0.15); color: var(--success); }
+        .level-very-low { background-color: rgba(203, 213, 225, 0.5); color: #64748b; }
+
+        .risk-count {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: rgba(49, 130, 206, 0.15);
+            color: var(--info);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .risk-count:hover {
+            background-color: rgba(49, 130, 206, 0.25);
+        }
+
+        .action-buttons-cell {
+            display: flex;
+            gap: 0.5rem;
+            z-index: 10;
+            pointer-events: auto !important;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer !important;
+            transition: var(--transition);
+            position: relative;
+            z-index: 10 !important;
+            user-select: none;
+            -webkit-user-select: none;
+            pointer-events: auto !important;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+
+        .action-btn i {
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .view-btn {
+            background-color: rgba(49, 130, 206, 0.15);
+            color: var(--info);
+            cursor: pointer !important;
+            z-index: 10 !important;
+            pointer-events: auto !important;
+        }
+
+        .view-btn:hover {
+            background-color: rgba(49, 130, 206, 0.25);
+            transform: scale(1.1);
+        }
+
+        .view-btn:active {
+            transform: scale(0.95);
+        }
+
+        .edit-btn {
+            background-color: rgba(56, 161, 105, 0.15);
+            color: var(--success);
+            cursor: pointer !important;
+            z-index: 10 !important;
+            pointer-events: auto !important;
+        }
+
+        .edit-btn:hover {
+            background-color: rgba(56, 161, 105, 0.25);
+            transform: scale(1.1);
+        }
+
+        .edit-btn:active {
+            transform: scale(0.95);
+        }
+
+        .delete-btn {
+            background-color: rgba(229, 62, 62, 0.15);
+            color: var(--danger);
+            cursor: pointer !important;
+            z-index: 10 !important;
+            pointer-events: auto !important;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(229, 62, 62, 0.25);
+            transform: scale(1.1);
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination-btn {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .pagination-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: var(--transition);
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94a3b8;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(14, 159, 110, 0.2);
+        }
+
+        .form-tooltip {
+            display: block;
+            margin-top: 0.3rem;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .conditional-fields {
+            padding: 1rem;
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            border-left: 3px solid var(--info);
+        }
+
+        .modal-footer {
+            padding: 1.2rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+
+        /* Import Modal */
+        .import-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .import-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #e2e8f0;
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .step.active .step-number {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .step.active .step-label {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .step-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .download-template {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem;
+            background-color: #f1f5f9;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+
+        .download-icon {
+            font-size: 1.5rem;
+            color: var(--info);
+        }
+
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 0.6rem;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .preview-table th {
+            background-color: #f1f5f9;
+        }
+
+        /* Progress Bar */
+        .progress-bar-container {
+            background-color: #f1f5f9;
+            border-radius: var(--border-radius);
+            height: 24px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .scan-progress {
+            margin-bottom: 1.5rem;
+        }
+
+        #scanOutput pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* Terminal-like output colors */
+        #scanOutput .success {
+            color: #38a169;
+        }
+
+        #scanOutput .error {
+            color: #e53e3e;
+        }
+
+        #scanOutput .warning {
+            color: #dd6b20;
+        }
+
+        /* Asset Summary Card */
+        .asset-summary-card {
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--info);
+        }
+
+        .asset-summary-card h4 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .asset-summary-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .asset-summary-details div {
+            padding: 0.5rem 0;
+        }
+
+        .asset-summary-details strong {
+            color: var(--dark);
+            margin-right: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* ── Confirm Modals (Edit = green, Delete = red) ── */
+        .confirm-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .confirm-overlay.show { opacity: 1; visibility: visible; }
+
+        .confirm-box {
+            background: white;
+            border-radius: 12px;
+            padding: 2.5rem 2rem 2rem;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
+            text-align: center;
+            transform: translateY(-24px) scale(0.97);
+            transition: var(--transition);
+        }
+        .confirm-overlay.show .confirm-box { transform: translateY(0) scale(1); }
+
+        .confirm-ring {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.4rem;
+            font-size: 2rem;
+        }
+        .confirm-ring.green { border: 3px solid #38a169; color: #38a169; background: rgba(56,161,105,0.07); }
+        .confirm-ring.red   { border: 3px solid #e53e3e; color: #e53e3e; background: rgba(229,62,62,0.07); }
+
+        .confirm-title    { font-size: 1.55rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+        .confirm-subtitle { font-size: 0.97rem; color: #64748b; margin-bottom: 1.8rem; line-height: 1.5; }
+
+        .confirm-actions  { display: flex; justify-content: center; gap: 1rem; }
+
+        .cbtn {
+            padding: 0.65rem 2.2rem;
+            border-radius: var(--border-radius);
+            font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: var(--transition);
+            border: none;
+        }
+        .cbtn-no  { background: white; border: 1px solid var(--gray); color: var(--dark); }
+        .cbtn-no:hover { background: #f1f5f9; }
+        .cbtn-green { background: #38a169; color: white; }
+        .cbtn-green:hover { background: #2f855a; }
+        .cbtn-red   { background: #e53e3e; color: white; }
+        .cbtn-red:hover   { background: #c53030; }
+
+        /* Edit form footer buttons */
+        .btn-discard {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--gray);
+            background: white; color: var(--dark);
+            font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 0.6rem;
+            transition: var(--transition);
+        }
+        .btn-discard:hover { background: #f8fafc; }
+        .btn-save-changes {
+            padding: 0.7rem 1.2rem;
+            border-radius: var(--border-radius);
+            border: none;
+            background: var(--accent); color: white;
+            font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 0.6rem;
+            transition: var(--transition);
+        }
+        .btn-save-changes:hover { background: #0c7a55; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+            
+            .asset-summary-details {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.8rem;
+            }
+            
+            .nav-item span {
+                display: none;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .import-steps {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: flex-start;
+            }
+            
+            .import-steps::before {
+                display: none;
+            }
+            
+            .step {
+                flex-direction: row;
+                gap: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="logo-text"> RiskMate </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-item active" id="nav-dashboard">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/asset-inventory" class="nav-item" id="nav-asset-inventory">
+                <i class="fas fa-server"></i>
+                <span>Asset Inventory</span>
+            </a>
+            <a href="/risk-register" class="nav-item" id="nav-risk-register">
+                <i class="fas fa-list"></i>
+                <span>Risk Register</span>
+            </a>
+            <a href="/risk-assessment" class="nav-item" id="nav-risk-assessment">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Risk Assessment</span>
+            </a>
+            <a href="/analyze-risk" class="nav-item" id="nav-analyze-risk">
+                <i class="fas fa-chart-line"></i>
+                <span>Analyze Risk</span>
+            </a>
+            <a href="/respond-to-risk" class="nav-item" id="nav-respond-to-risk">
+                <i class="fas fa-tasks"></i>
+                <span>Respond to Risk</span>
+            </a>
+            <a href="/reports" class="nav-item" id="nav-reports">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="currentUser">Ahmed Khan</div>
+                <div class="user-role" id="currentRole">Security Engineer</div>
+            </div>
+            <div class="user-profile" onclick="toggleProfileDropdown()">
+                <div class="avatar" id="userAvatar">A</div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <div class="dropdown-user-name" id="dropdownUserName">Ahmed Khan</div>
+                        <div class="dropdown-user-role" id="dropdownUserRole">Security Engineer</div>
+                    </div>
+                    <div class="dropdown-item" onclick="openSettingsModal()">
+                        <i class="fas fa-cog"></i>
+                        <span>Account Settings</span>
+                    </div>
+                    <div class="dropdown-item" onclick="openHelpModal()">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Help & Support</span>
+                    </div>
+                    <div class="dropdown-item danger" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Asset Inventory</h1>
+                <p class="page-description">Manage all physical, digital, and process assets for your risk assessments. You can add assets one by one or import them in bulk.</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="importAssetBtn">
+                    <i class="fas fa-file-import"></i>
+                    Import from CSV
+                </button>
+                <button class="btn btn-info" id="fetchNetworkBtn">
+                    <i class="fas fa-network-wired"></i>
+                    Fetch from Network
+                </button>
+                <button class="btn btn-primary" id="addAssetBtn">
+                    <i class="fas fa-plus"></i>
+                    Add New Asset
+                </button>
+            </div>
+        </div>
+        
+        <!-- Filters and Search -->
+        <div class="filters-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search assets or owners...">
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Asset Type:</span>
+                <select class="filter-select" id="typeFilter">
+                    <option value="all">All Types</option>
+                    <option value="Digital">Digital</option>
+                    <option value="Physical">Physical</option>
+                    <option value="People">People</option>
+                    <option value="Process">Process</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Asset Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">All Assets</h2>
+                <div class="table-summary" id="tableSummary">Loading assets...</div>
+            </div>
+            
+            <table class="asset-table">
+                <thead>
+                    <tr>
+                        <th>Asset ID</th>
+                        <th>Asset Name</th>
+                        <th>Type</th>
+                        <th>Owner</th>
+                        <th>Location</th>
+                        <th>Risks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assetsTableBody">
+                    <!-- Dynamic content loaded via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+        <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                Automated Risk Analysis Framework (NIST 800-30 / ISO 27005)
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About This Project</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+                <a href="#" class="footer-link">Terms of Service</a>
+            </div>
+            <div class="footer-copyright">
+                &copy; 2025 CyberRisk Analytics Institute
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Add Asset Modal -->
+    <div class="modal" id="addAssetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Asset</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="form-tooltip" style="margin-bottom: 1.5rem;">Enter the details for your asset below. All fields are required unless marked optional.</p>
+                
+                <form id="addAssetForm">
+                    <div class="form-group">
+                        <label class="form-label" for="assetName">Asset Name *</label>
+                        <input type="text" class="form-input" id="assetName" placeholder="e.g., Primary Customer Database" required>
+                        <span class="form-tooltip">A unique, descriptive name for this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="assetDescription">Description</label>
+                        <textarea class="form-input" id="assetDescription" placeholder="e.g., Main database containing customer information and transaction history" rows="3"></textarea>
+                        <span class="form-tooltip">Optional description of the asset's purpose and function</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="assetOwner">Asset Owner *</label>
+                        <input type="text" class="form-input" id="assetOwner" placeholder="e.g., IT Department, John Doe" required>
+                        <span class="form-tooltip">The individual or team responsible for this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="assetLocation">Location</label>
+                        <input type="text" class="form-input" id="assetLocation" placeholder="e.g., Data Center A, Cloud Region US-East">
+                        <span class="form-tooltip">Physical location or logical placement of the asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="assetType">Asset Type *</label>
+                        <select class="form-select" id="assetType" required>
+                            <option value="">Select an asset type</option>
+                            <option value="digital">Digital</option>
+                            <option value="physical">Physical</option>
+                            <option value="people">People</option>
+                            <option value="process">Process</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="assetValue">Asset Value ($)</label>
+                        <input type="number" step="0.01" class="form-input" id="assetValue" placeholder="e.g., 100000.00">
+                        <span class="form-tooltip">Enter the monetary value of this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="confidentiality">Confidentiality Impact (1-5) *</label>
+                        <select class="form-select" id="confidentiality" required>
+                            <option value="">Select confidentiality impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the confidentiality of data/assets</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="integrity">Integrity Impact (1-5) *</label>
+                        <select class="form-select" id="integrity" required>
+                            <option value="">Select integrity impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the integrity of data/assets</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="availability">Availability Impact (1-5) *</label>
+                        <select class="form-select" id="availability" required>
+                            <option value="">Select availability impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the availability of data/assets</span>
+                    </div>
+                    
+                    <!-- Conditional Fields for Digital Assets -->
+                    <div class="conditional-fields" id="digitalFields" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;">Digital Asset Details</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="ipAddress">IP Address</label>
+                            <input type="text" class="form-input" id="ipAddress" placeholder="e.g., 192.168.1.100">
+                            <span class="form-tooltip">The IP address of the digital asset</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="macAddress">MAC Address</label>
+                            <input type="text" class="form-input" id="macAddress" placeholder="e.g., 00:1A:2B:3C:4D:5E">
+                            <span class="form-tooltip">The MAC (Media Access Control) address of the digital asset</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelAddAsset">Cancel</button>
+                <button class="btn btn-primary" id="saveAssetBtn">Save Asset</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Import CSV Modal -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Import Assets from CSV</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-steps">
+                    <div class="step active" id="step1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Download Template</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Upload File</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Confirm Import</div>
+                    </div>
+                </div>
+                
+                <div class="step-content" id="step1Content">
+                    <div class="download-template">
+                        <div class="download-icon">
+                            <i class="fas fa-file-csv"></i>
+                        </div>
+                        <div>
+                            <h4>Use our template for best results</h4>
+                            <p>To ensure your data is formatted correctly, please use our template with all required columns.</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="downloadTemplateBtn">
+                        <i class="fas fa-download"></i>
+                        Download CSV Template
+                    </button>
+                </div>
+                
+                <div class="step-content" id="step2Content" style="display: none;">
+                    <div class="file-upload" id="fileUploadArea">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h4>Drag & Drop your CSV file here</h4>
+                        <p>or</p>
+                        <button class="btn btn-primary" id="browseFilesBtn">Browse Files</button>
+                        <input type="file" id="csvFileInput" class="file-input" accept=".csv">
+                    </div>
+                    <div id="fileInfo" style="margin-top: 1rem; display: none;">
+                        <p><strong>Selected file:</strong> <span id="fileName"></span></p>
+                    </div>
+                </div>
+                
+                <div class="step-content" id="step3Content" style="display: none;">
+                    <h4>Review Import Data</h4>
+                    <p>The following assets will be imported. Please review before confirming.</p>
+                    
+                    <div class="table-container" style="margin-top: 1rem;">
+                        <table class="preview-table" id="importPreviewTable">
+                            <thead>
+                                <tr>
+                                    <th>Asset Name</th>
+                                    <th>Type</th>
+                                    <th>Owner</th>
+                                    <th>Location</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importPreviewBody">
+                                <!-- Preview data will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="importSummary" style="margin-top: 1rem;">
+                        <p><strong>Total assets to import:</strong> <span id="importCount">0</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelImport">Cancel</button>
+                <button class="btn btn-primary" id="nextStepBtn">Next</button>
+                <button class="btn btn-primary" id="confirmImportBtn" style="display: none;">Confirm Import</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Asset Detail Modal (for risk view) -->
+    <div class="modal" id="assetDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="assetDetailTitle">Asset Details</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="assetInfo">
+                    <!-- Asset information will be inserted here -->
+                </div>
+                
+                <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">Associated Risks</h4>
+                <div class="table-container">
+                    <table class="asset-table">
+                        <thead>
+                            <tr>
+                                <th>Risk ID</th>
+                                <th>Risk Description</th>
+                                <th>Likelihood</th>
+                                <th>Impact</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="risksTableBody">
+                            <!-- Risks will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeAssetDetailBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Asset Modal -->
+    <div class="modal" id="editAssetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Asset</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="form-tooltip" style="margin-bottom: 1.5rem;">Edit asset details below.</p>
+                
+                <form id="editAssetForm">
+                    <input type="hidden" id="editAssetId">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetName">Asset Name *</label>
+                        <input type="text" class="form-input" id="editAssetName" placeholder="e.g., Primary Customer Database" required>
+                        <span class="form-tooltip">A unique, descriptive name for this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetDescription">Description</label>
+                        <textarea class="form-input" id="editAssetDescription" placeholder="e.g., Main database containing customer information and transaction history" rows="3"></textarea>
+                        <span class="form-tooltip">Optional description of the asset's purpose and function</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetOwner">Asset Owner *</label>
+                        <input type="text" class="form-input" id="editAssetOwner" placeholder="e.g., IT Department, John Doe" required>
+                        <span class="form-tooltip">The individual or team responsible for this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetLocation">Location</label>
+                        <input type="text" class="form-input" id="editAssetLocation" placeholder="e.g., Data Center A, Cloud Region US-East">
+                        <span class="form-tooltip">Physical location or logical placement of the asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetType">Asset Type *</label>
+                        <select class="form-select" id="editAssetType" required>
+                            <option value="">Select an asset type</option>
+                            <option value="digital">Digital</option>
+                            <option value="physical">Physical</option>
+                            <option value="people">People</option>
+                            <option value="process">Process</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAssetValue">Asset Value ($)</label>
+                        <input type="number" step="0.01" class="form-input" id="editAssetValue" placeholder="e.g., 100000.00">
+                        <span class="form-tooltip">Enter the monetary value of this asset</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editConfidentiality">Confidentiality Impact (1-5) *</label>
+                        <select class="form-select" id="editConfidentiality" required>
+                            <option value="">Select confidentiality impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the confidentiality of data/assets</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editIntegrity">Integrity Impact (1-5) *</label>
+                        <select class="form-select" id="editIntegrity" required>
+                            <option value="">Select integrity impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the integrity of data/assets</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="editAvailability">Availability Impact (1-5) *</label>
+                        <select class="form-select" id="editAvailability" required>
+                            <option value="">Select availability impact</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Medium</option>
+                            <option value="4">4 - High</option>
+                            <option value="5">5 - Very High</option>
+                        </select>
+                        <span class="form-tooltip">How critical is the availability of data/assets</span>
+                    </div>
+                    
+                    <!-- Conditional Fields for Digital Assets -->
+                    <div class="conditional-fields" id="editDigitalFields" style="display: none;">
+                        <h4 style="margin-bottom: 1rem;">Digital Asset Details</h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="editIpAddress">IP Address</label>
+                            <input type="text" class="form-input" id="editIpAddress" placeholder="e.g., 192.168.1.100">
+                            <span class="form-tooltip">The IP address of the digital asset</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="editMacAddress">MAC Address</label>
+                            <input type="text" class="form-input" id="editMacAddress" placeholder="e.g., 00:1A:2B:3C:4D:5E">
+                            <span class="form-tooltip">The MAC (Media Access Control) address of the digital asset</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEditAsset">Cancel</button>
+                <button class="btn btn-primary" id="updateAssetBtn">Update Asset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fetch Assets from Network Modal -->
+    <div class="modal" id="fetchNetworkModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Fetch Assets from Network</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-steps">
+                    <div class="step active" id="fetchStep1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Select Subnet</div>
+                    </div>
+                    <div class="step" id="fetchStep2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Scan Network</div>
+                    </div>
+                    <div class="step" id="fetchStep3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Review Assets</div>
+                    </div>
+                </div>
+                
+                <!-- Step 1: Select Subnet -->
+                <div class="step-content" id="fetchStep1Content">
+                    <!-- Subnet Inventory Table -->
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label class="form-label" style="margin: 0;">Subnet Inventory *</label>
+                            <button type="button" class="btn btn-primary" id="addSubnetBtn" style="padding: 0.45rem 0.9rem;">
+                                <i class="fas fa-plus"></i>
+                                Add Subnet
+                            </button>
+                        </div>
+                        <span class="form-tooltip">Click a row to select it for scanning. Use the actions to edit or remove a subnet.</span>
+                        <div class="table-container" style="margin-top: 0.5rem; max-height: 280px; overflow-y: auto;">
+                            <table class="asset-table" id="subnetInventoryTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40px;"></th>
+                                        <th>Name</th>
+                                        <th>Subnet (CIDR)</th>
+                                        <th>Criticality</th>
+                                        <th style="width: 110px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subnetInventoryTableBody">
+                                    <tr><td colspan="5" style="text-align: center; padding: 1rem; color: #64748b;">Loading subnets...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="selectedSubnetBanner" style="margin-top: 0.6rem; padding: 0.55rem 0.8rem; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--border-radius); color: #1e40af; font-size: 0.9rem; display: none;">
+                            <i class="fas fa-check-circle"></i>
+                            Selected subnet: <strong><span id="selectedSubnetBannerText"></span></strong>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Subnet Form (toggled) -->
+                    <div id="subnetFormContainer" style="display: none; margin-top: 1rem; padding: 1rem; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--border-radius);">
+                        <h4 id="subnetFormTitle" style="margin: 0 0 0.75rem 0; font-size: 1rem; color: var(--secondary);">Add New Subnet</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label class="form-label" for="subnetFormName">Name *</label>
+                                <input type="text" class="form-input" id="subnetFormName" placeholder="e.g., Core Network">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0.5rem;">
+                                <label class="form-label" for="subnetFormCidr">Subnet (CIDR) *</label>
+                                <input type="text" class="form-input" id="subnetFormCidr" placeholder="e.g., 192.168.100.0/24">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0.75rem;">
+                            <label class="form-label" for="subnetFormCriticality">Criticality *</label>
+                            <select class="form-select" id="subnetFormCriticality">
+                                <option value="">Select criticality</option>
+                                <option value="Critical">Critical</option>
+                                <option value="V.High">V.High</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <button type="button" class="btn btn-secondary" id="cancelSubnetFormBtn">Cancel</button>
+                            <button type="button" class="btn btn-success" id="saveSubnetFormBtn">
+                                <i class="fas fa-save"></i>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label" for="knownIps">Known IPs (Optional)</label>
+                        <textarea class="form-input" id="knownIps" placeholder="Enter known IPs (one per line)&#10;e.g., 192.168.100.28&#10;192.168.100.31" rows="3"></textarea>
+                        <span class="form-tooltip">Enter specific IP addresses to scan (one per line)</span>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Scan Network -->
+                <div class="step-content" id="fetchStep2Content" style="display: none;">
+                    <div class="scan-progress">
+                        <div class="form-group">
+                            <label class="form-label">Network Scan Progress</label>
+                            <div class="progress-bar-container">
+                                <div id="scanProgressBar" style="background-color: var(--accent); height: 100%; width: 0%; border-radius: var(--border-radius); transition: width 0.3s ease;"></div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #64748b;">
+                                <span id="scanStatus">Ready to scan</span>
+                                <span id="scanProgressText">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Scan Output</label>
+                            <div id="scanOutput" style="background-color: #1e293b; color: #cbd5e1; border-radius: var(--border-radius); padding: 1rem; max-height: 300px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.9rem; white-space: pre-wrap; word-break: break-all;">
+<pre style="margin: 0; color: #94a3b8;">
+==================================================
+Host Discovery - Multi-Method Scanner
+==================================================
+
+Waiting for scan to begin...
+</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Review Assets -->
+                <div class="step-content" id="fetchStep3Content" style="display: none;">
+                    <div class="asset-summary-card">
+                        <h4>Import Configuration</h4>
+                        <p>The following configuration will be used for all discovered assets:</p>
+                        <div class="asset-summary-details">
+                            <div><strong>Asset Owner:</strong> Network Team</div>
+                            <div><strong>Asset Type:</strong> Digital</div>
+                            <div><strong>Location:</strong> <span id="selectedSubnetDisplay">N/A</span></div>
+                            <div><strong>CIA Impact:</strong> C:3, I:3, A:3 (Medium)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Discovered Assets</label>
+                        <div class="table-container" style="margin-top: 0.5rem; max-height: 300px; overflow-y: auto;">
+                            <table class="asset-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 20px;">
+                                            <input type="checkbox" id="selectAllAssets" checked>
+                                        </th>
+                                        <th>IP Address</th>
+                                        <th>Hostname</th>
+                                        <th>MAC Address</th>
+                                        <th>Detection Method</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discoveredAssetsTable">
+                                    <!-- Discovered assets will appear here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="importSummary" style="margin-top: 1rem; padding: 1rem; background-color: #f1f5f9; border-radius: var(--border-radius);">
+                        <p><strong>Total assets discovered:</strong> <span id="discoveredAssetCount">0</span></p>
+                        <p><strong>Selected for import:</strong> <span id="selectedAssetCount">0</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelFetchNetwork">Cancel</button>
+                <button class="btn btn-secondary" id="prevStepBtn" style="display: none;">Previous</button>
+                <button class="btn btn-primary" id="nextFetchStepBtn">Next</button>
+                <button class="btn btn-success" id="saveDiscoveredAssetsBtn" style="display: none;">
+                    <i class="fas fa-save"></i>
+                    Save Assets
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Confirm Modal (Green) -->
+    <div class="confirm-overlay" id="assetEditConfirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-ring green"><i class="fas fa-check"></i></div>
+            <div class="confirm-title">Edit Asset?</div>
+            <div class="confirm-subtitle">Are you sure you want to edit this asset's details?</div>
+            <div class="confirm-actions">
+                <button class="cbtn cbtn-no" id="assetEditConfirmNo">No</button>
+                <button class="cbtn cbtn-green" id="assetEditConfirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Asset Edit Form Modal -->
+    <div class="modal" id="assetEditFormModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Asset</h3>
+                <button class="modal-close" id="assetEditFormClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="aeAssetId">
+                <div class="form-group">
+                    <label class="form-label">Asset Name *</label>
+                    <input type="text" class="form-input" id="aeAssetName" placeholder="e.g., Primary Customer Database">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="aeAssetDescription" rows="3" placeholder="Asset description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Asset Owner *</label>
+                    <input type="text" class="form-input" id="aeAssetOwner" placeholder="e.g., IT Department">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="aeAssetLocation" placeholder="e.g., Data Center A">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Asset Type *</label>
+                    <select class="form-select" id="aeAssetType">
+                        <option value="digital">Digital</option>
+                        <option value="physical">Physical</option>
+                        <option value="people">People</option>
+                        <option value="process">Process</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Asset Value ($)</label>
+                    <input type="number" step="0.01" class="form-input" id="aeAssetValue" placeholder="e.g., 100000.00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confidentiality Impact (1-5) *</label>
+                    <select class="form-select" id="aeConfidentiality">
+                        <option value="1">1 - Very Low</option>
+                        <option value="2">2 - Low</option>
+                        <option value="3">3 - Medium</option>
+                        <option value="4">4 - High</option>
+                        <option value="5">5 - Very High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Integrity Impact (1-5) *</label>
+                    <select class="form-select" id="aeIntegrity">
+                        <option value="1">1 - Very Low</option>
+                        <option value="2">2 - Low</option>
+                        <option value="3">3 - Medium</option>
+                        <option value="4">4 - High</option>
+                        <option value="5">5 - Very High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Availability Impact (1-5) *</label>
+                    <select class="form-select" id="aeAvailability">
+                        <option value="1">1 - Very Low</option>
+                        <option value="2">2 - Low</option>
+                        <option value="3">3 - Medium</option>
+                        <option value="4">4 - High</option>
+                        <option value="5">5 - Very High</option>
+                    </select>
+                </div>
+                <div class="conditional-fields" id="aeDigitalFields" style="display:none;">
+                    <h4 style="margin-bottom:1rem;">Digital Asset Details</h4>
+                    <div class="form-group">
+                        <label class="form-label">IP Address</label>
+                        <input type="text" class="form-input" id="aeIpAddress" placeholder="e.g., 192.168.1.100">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">MAC Address</label>
+                        <input type="text" class="form-input" id="aeMacAddress" placeholder="e.g., 00:1A:2B:3C:4D:5E">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-discard" id="aeDiscardBtn"><i class="fas fa-times"></i> Discard</button>
+                <button class="btn-save-changes" id="aeSaveBtn"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal (Red) -->
+    <div class="confirm-overlay" id="assetDeleteConfirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-ring red"><i class="fas fa-trash-alt"></i></div>
+            <div class="confirm-title">Delete Asset?</div>
+            <div class="confirm-subtitle">Are you sure you want to delete this asset?<br>This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="cbtn cbtn-no" id="assetDeleteConfirmNo">No</button>
+                <button class="cbtn cbtn-red" id="assetDeleteConfirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subnet Edit Confirmation Modal (Green) -->
+    <div class="confirm-overlay" id="subnetEditConfirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-ring green"><i class="fas fa-check"></i></div>
+            <div class="confirm-title">Edit Subnet?</div>
+            <div class="confirm-subtitle">Are you sure you want to edit this subnet's details?</div>
+            <div class="confirm-actions">
+                <button class="cbtn cbtn-no" id="subnetEditConfirmNo">No</button>
+                <button class="cbtn cbtn-green" id="subnetEditConfirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subnet Delete Confirmation Modal (Red) -->
+    <div class="confirm-overlay" id="subnetDeleteConfirmOverlay">
+        <div class="confirm-box">
+            <div class="confirm-ring red"><i class="fas fa-trash-alt"></i></div>
+            <div class="confirm-title">Delete Subnet?</div>
+            <div class="confirm-subtitle" id="subnetDeleteSubtitle">Are you sure you want to delete this subnet? This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="cbtn cbtn-no" id="subnetDeleteConfirmNo">No</button>
+                <button class="cbtn cbtn-red" id="subnetDeleteConfirmYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for API calls
+        const API_BASE_URL = window.location.origin;
+
+        document.addEventListener('DOMContentLoaded', function() {
+                        // Profile dropdown
+            const userProfileEl = document.getElementById('userProfile');
+            const profileDropdownEl = document.getElementById('profileDropdown');
+            if (userProfileEl) {
+                userProfileEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    profileDropdownEl.classList.toggle('show');
+                });
+                document.addEventListener('click', function(e) {
+                    if (!userProfileEl.contains(e.target)) {
+                        profileDropdownEl.classList.remove('show');
+                    }
+                });
+            }
+            const logoutBtnEl = document.getElementById('logoutBtn');
+            if (logoutBtnEl) {
+                logoutBtnEl.addEventListener('click', function() {
+                    window.location.href = '/logout';
+                });
+            }
+            // Highlight active nav
+            (function() {
+                const path = window.location.pathname;
+                document.querySelectorAll('.nav-item').forEach(function(item) {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === path) item.classList.add('active');
+                });
+            })();
+            
+            // Modal handling
+            const addAssetBtn = document.getElementById('addAssetBtn');
+            const importAssetBtn = document.getElementById('importAssetBtn');
+            const fetchNetworkBtn = document.getElementById('fetchNetworkBtn');
+            const addAssetModal = document.getElementById('addAssetModal');
+            const importModal = document.getElementById('importModal');
+            const fetchNetworkModal = document.getElementById('fetchNetworkModal');
+            const editAssetModal = document.getElementById('editAssetModal');
+            const assetDetailModal = document.getElementById('assetDetailModal');
+            const cancelAddAsset = document.getElementById('cancelAddAsset');
+            const cancelImport = document.getElementById('cancelImport');
+            const cancelFetchNetwork = document.getElementById('cancelFetchNetwork');
+            const modalCloseButtons = document.querySelectorAll('.modal-close');
+            const assetTypeSelect = document.getElementById('assetType');
+            const digitalFields = document.getElementById('digitalFields');
+            const editAssetTypeSelect = document.getElementById('editAssetType');
+            const editDigitalFields = document.getElementById('editDigitalFields');
+            const closeAssetDetailBtn = document.getElementById('closeAssetDetailBtn');
+            
+            // Open modals
+            addAssetBtn.addEventListener('click', function() {
+                addAssetModal.classList.add('show');
+            });
+            
+            importAssetBtn.addEventListener('click', function() {
+                importModal.classList.add('show');
+            });
+            
+            fetchNetworkBtn.addEventListener('click', function() {
+                fetchNetworkModal.classList.add('show');
+                loadSubnets();
+                resetFetchNetworkModal();
+            });
+            
+            // Close modals
+            cancelAddAsset.addEventListener('click', function() {
+                addAssetModal.classList.remove('show');
+            });
+            
+            cancelImport.addEventListener('click', function() {
+                importModal.classList.remove('show');
+                resetImportModal();
+            });
+            
+            cancelFetchNetwork.addEventListener('click', function() {
+                fetchNetworkModal.classList.remove('show');
+                resetFetchNetworkModal();
+            });
+            
+            closeAssetDetailBtn.addEventListener('click', function() {
+                assetDetailModal.classList.remove('show');
+            });
+            
+            modalCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').classList.remove('show');
+                });
+            });
+            
+            // Close modal when clicking outside
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('show');
+                }
+            });
+            
+            // Conditional fields for digital assets
+            assetTypeSelect.addEventListener('change', function() {
+                if (this.value === 'digital') {
+                    digitalFields.style.display = 'block';
+                } else {
+                    digitalFields.style.display = 'none';
+                }
+            });
+            
+            editAssetTypeSelect.addEventListener('change', function() {
+                if (this.value === 'digital') {
+                    editDigitalFields.style.display = 'block';
+                } else {
+                    editDigitalFields.style.display = 'none';
+                }
+            });
+            
+            // Load assets on page load
+            loadAssets();
+            
+            // Add new asset
+            document.getElementById('saveAssetBtn').addEventListener('click', function() {
+                const assetData = {
+                    name: document.getElementById('assetName').value,
+                    description: document.getElementById('assetDescription').value,
+                    owner: document.getElementById('assetOwner').value,
+                    location: document.getElementById('assetLocation').value,
+                    type: document.getElementById('assetType').value,
+                    confidentiality_impact: document.getElementById('confidentiality').value,
+                    integrity_impact: document.getElementById('integrity').value,
+                    availability_impact: document.getElementById('availability').value,
+                    ip_address: document.getElementById('ipAddress').value,
+                    mac_address: document.getElementById('macAddress').value,
+                    asset_value: document.getElementById('assetValue').value || null
+                };
+                
+                // Validation
+                if (!assetData.name || !assetData.owner || !assetData.type || !assetData.confidentiality_impact || !assetData.integrity_impact || !assetData.availability_impact) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Show loading state
+                const saveBtn = document.getElementById('saveAssetBtn');
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+                
+                fetch(`${API_BASE_URL}/api/assets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(assetData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        addAssetModal.classList.remove('show');
+                        document.getElementById('addAssetForm').reset();
+                        digitalFields.style.display = 'none';
+                        loadAssets();
+                        alert('Asset added successfully with ID: ' + data.asset_id);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error adding asset');
+                })
+                .finally(() => {
+                    // Reset button state
+                    saveBtn.innerHTML = originalText;
+                    saveBtn.disabled = false;
+                });
+            });
+            
+            // Update asset
+            document.getElementById('updateAssetBtn').addEventListener('click', function() {
+                const assetId = document.getElementById('editAssetId').value;
+                const assetData = {
+                    name: document.getElementById('editAssetName').value,
+                    description: document.getElementById('editAssetDescription').value,
+                    owner: document.getElementById('editAssetOwner').value,
+                    location: document.getElementById('editAssetLocation').value,
+                    type: document.getElementById('editAssetType').value,
+                    confidentiality_impact: document.getElementById('editConfidentiality').value,
+                    integrity_impact: document.getElementById('editIntegrity').value,
+                    availability_impact: document.getElementById('editAvailability').value,
+                    ip_address: document.getElementById('editIpAddress').value,
+                    mac_address: document.getElementById('editMacAddress').value,
+                    asset_value: document.getElementById('editAssetValue').value || null
+                };
+                
+                if (!assetId || !assetData.name || !assetData.owner || !assetData.type || !assetData.confidentiality_impact || !assetData.integrity_impact || !assetData.availability_impact) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Show loading state
+                const updateBtn = document.getElementById('updateAssetBtn');
+                const originalText = updateBtn.innerHTML;
+                updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                updateBtn.disabled = true;
+                
+                fetch(`${API_BASE_URL}/api/assets/${assetId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(assetData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        editAssetModal.classList.remove('show');
+                        loadAssets();
+                        alert('Asset updated successfully!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating asset');
+                })
+                .finally(() => {
+                    // Reset button state
+                    updateBtn.innerHTML = originalText;
+                    updateBtn.disabled = false;
+                });
+            });
+            
+            // Cancel edit
+            document.getElementById('cancelEditAsset').addEventListener('click', function() {
+                editAssetModal.classList.remove('show');
+            });
+            
+            // Load assets function
+            function loadAssets() {
+                fetch(`${API_BASE_URL}/api/assets`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            document.getElementById('tableSummary').textContent = 'Error loading assets';
+                            return;
+                        }
+                        
+                        const tbody = document.getElementById('assetsTableBody');
+                        tbody.innerHTML = '';
+                        
+                        if (data.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No assets found</td></tr>';
+                            document.getElementById('tableSummary').textContent = '0 assets';
+                            return;
+                        }
+                        
+                        data.forEach(asset => {
+                            const row = document.createElement('tr');
+                            
+                            // Type icon mapping
+                            const typeIcons = {
+                                'Digital': { icon: 'fa-database', class: 'type-digital' },
+                                'Physical': { icon: 'fa-building', class: 'type-physical' },
+                                'People': { icon: 'fa-user', class: 'type-people' },
+                                'Process': { icon: 'fa-cogs', class: 'type-process' }
+                            };
+                            
+                            const typeInfo = typeIcons[asset.type] || { icon: 'fa-question', class: 'type-digital' };
+                            
+                            row.innerHTML = `
+                                <td>${asset.id}</td>
+                                <td>${asset.name}</td>
+                                <td>
+                                    <div class="asset-type">
+                                        <div class="type-icon ${typeInfo.class}">
+                                            <i class="fas ${typeInfo.icon}"></i>
+                                        </div>
+                                        <span>${asset.type}</span>
+                                    </div>
+                                </td>
+                                <td>${asset.owner}</td>
+                                <td>${asset.asset_location || 'N/A'}</td>
+                                <td><span class="risk-count" data-asset-id="${asset.id}">${asset.risk_count || 0}</span></td>
+                                <td>
+                                    <div class="action-buttons-cell">
+                                        <div class="action-btn view-btn" data-asset-id="${asset.id}">
+                                            <i class="fas fa-eye"></i>
+                                        </div>
+                                        <div class="action-btn edit-btn" data-asset-id="${asset.id}">
+                                            <i class="fas fa-edit"></i>
+                                        </div>
+                                        <div class="action-btn delete-btn" data-asset-id="${asset.id}">
+                                            <i class="fas fa-trash"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                            `;
+                            
+                            tbody.appendChild(row);
+                        });
+                        
+                        document.getElementById('tableSummary').textContent = `${data.length} assets`;
+                        
+                        // Add event listeners to the new buttons
+                        addEventListenersToButtons();
+                        applyFilters(); // Apply filters after loading
+                    })
+                    .catch(error => {
+                        console.error('Error loading assets:', error);
+                        document.getElementById('tableSummary').textContent = 'Error loading assets';
+                    });
+            }
+            
+            // Add event listeners to dynamic buttons
+            function addEventListenersToButtons() {
+                // View asset details
+                document.querySelectorAll('.view-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const assetId = this.getAttribute('data-asset-id');
+                        viewAsset(assetId);
+                    });
+                });
+                
+                // Edit asset — open green confirm first
+                document.querySelectorAll('.edit-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        pendingEditId = this.getAttribute('data-asset-id');
+                        document.getElementById('assetEditConfirmOverlay').classList.add('show');
+                    });
+                });
+                
+                // Delete asset — open red confirm first
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        pendingDeleteId = this.getAttribute('data-asset-id');
+                        document.getElementById('assetDeleteConfirmOverlay').classList.add('show');
+                    });
+                });
+                
+                // View risks
+                document.querySelectorAll('.risk-count').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const assetId = this.getAttribute('data-asset-id');
+                        viewAsset(assetId);
+                    });
+                });
+            }
+            
+            // View asset details
+            function viewAsset(assetId) {
+                // Show loading state
+                const assetInfoDiv = document.getElementById('assetInfo');
+                assetInfoDiv.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading asset details...</div>';
+                assetDetailModal.classList.add('show');
+                
+                fetch(`${API_BASE_URL}/api/assets/${assetId}`)
+                    .then(response => response.json())
+                    .then(asset => {
+                        if (asset.error) {
+                            alert('Error loading asset: ' + asset.error);
+                            return;
+                        }
+                        
+                        document.getElementById('assetDetailTitle').textContent = asset.name;
+                        
+                        // Format CIA scores
+                        const ciaScores = `C:${asset.confidentiality}, I:${asset.integrity}, A:${asset.availability}`;
+                        
+                        // Populate asset info
+                        document.getElementById('assetInfo').innerHTML = `
+                            <div style="margin-bottom: 1rem;">
+                                <strong>Description:</strong> ${asset.description || 'N/A'}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                                <div>
+                                    <strong>Asset ID:</strong> ${asset.id}
+                                </div>
+                                <div>
+                                    <strong>Type:</strong> ${asset.type}
+                                </div>
+                                <div>
+                                    <strong>Owner:</strong> ${asset.owner}
+                                </div>
+                                <div>
+                                    <strong>Location:</strong> ${asset.asset_location || 'N/A'}
+                                </div>
+                                <div>
+                                    <strong>Asset Value:</strong> ${asset.value ? '$' + parseFloat(asset.value).toLocaleString() : 'N/A'}
+                                </div>
+                                <div>
+                                    <strong>CIA Scores:</strong> ${ciaScores}
+                                </div>
+                                ${asset.ip_address ? `<div><strong>IP Address:</strong> ${asset.ip_address}</div>` : ''}
+                                ${asset.mac_address ? `<div><strong>MAC Address:</strong> ${asset.mac_address}</div>` : ''}
+                                <div>
+                                    <strong>Created:</strong> ${asset.created_at ? new Date(asset.created_at).toLocaleDateString() : 'N/A'}
+                                </div>
+                                <div>
+                                    <strong>Updated:</strong> ${asset.updated_at ? new Date(asset.updated_at).toLocaleDateString() : 'N/A'}
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Load associated risks
+                        return fetch(`${API_BASE_URL}/api/assets/${assetId}/risks`);
+                    })
+                    .then(response => response.json())
+                    .then(risks => {
+                        const tbody = document.getElementById('risksTableBody');
+                        tbody.innerHTML = '';
+                        
+                        if (risks.error || risks.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No risks found for this asset</td></tr>';
+                        } else {
+                            risks.forEach(risk => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${risk.id || 'N/A'}</td>
+                                    <td>${risk.title || 'N/A'}</td>
+                                    <td>${risk.likelihood_qual || 'N/A'}</td>
+                                    <td>${risk.impact_qual || 'N/A'}</td>
+                                    <td>${risk.calculated_level || 'N/A'}</td>
+                                `;
+                                tbody.appendChild(row);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading asset:', error);
+                        alert('Error loading asset details');
+                    });
+            }
+            
+            // ── Pending IDs for confirm modals ──
+            let pendingEditId   = null;
+            let pendingDeleteId = null;
+
+            // ── Edit confirm modal (Green) ──
+            const assetEditConfirmOverlay = document.getElementById('assetEditConfirmOverlay');
+            document.getElementById('assetEditConfirmNo').addEventListener('click', () => {
+                assetEditConfirmOverlay.classList.remove('show');
+                pendingEditId = null;
+            });
+            document.getElementById('assetEditConfirmYes').addEventListener('click', () => {
+                assetEditConfirmOverlay.classList.remove('show');
+                if (pendingEditId) loadAssetIntoEditForm(pendingEditId);
+            });
+            assetEditConfirmOverlay.addEventListener('click', e => {
+                if (e.target === assetEditConfirmOverlay) {
+                    assetEditConfirmOverlay.classList.remove('show');
+                    pendingEditId = null;
+                }
+            });
+
+            // ── Edit form modal ──
+            const assetEditFormModal = document.getElementById('assetEditFormModal');
+
+            document.getElementById('aeAssetType').addEventListener('change', function() {
+                document.getElementById('aeDigitalFields').style.display =
+                    this.value === 'digital' ? 'block' : 'none';
+            });
+
+            function closeAssetEditForm() {
+                assetEditFormModal.classList.remove('show');
+                pendingEditId = null;
+            }
+            document.getElementById('assetEditFormClose').addEventListener('click', closeAssetEditForm);
+            document.getElementById('aeDiscardBtn').addEventListener('click', closeAssetEditForm);
+            assetEditFormModal.addEventListener('click', e => {
+                if (e.target === assetEditFormModal) closeAssetEditForm();
+            });
+
+            function loadAssetIntoEditForm(assetId) {
+                fetch(`${API_BASE_URL}/api/assets/${assetId}`)
+                    .then(r => r.json())
+                    .then(asset => {
+                        if (asset.error) { alert('Error loading asset: ' + asset.error); return; }
+                        document.getElementById('aeAssetId').value          = asset.id;
+                        document.getElementById('aeAssetName').value        = asset.name || '';
+                        document.getElementById('aeAssetDescription').value = asset.description || '';
+                        document.getElementById('aeAssetOwner').value       = asset.owner || '';
+                        document.getElementById('aeAssetLocation').value    = asset.asset_location || '';
+                        document.getElementById('aeAssetType').value        = (asset.type || 'digital').toLowerCase();
+                        document.getElementById('aeAssetValue').value       = asset.value || '';
+                        document.getElementById('aeConfidentiality').value  = asset.confidentiality || '3';
+                        document.getElementById('aeIntegrity').value        = asset.integrity || '3';
+                        document.getElementById('aeAvailability').value     = asset.availability || '3';
+                        document.getElementById('aeIpAddress').value        = asset.ip_address || '';
+                        document.getElementById('aeMacAddress').value       = asset.mac_address || '';
+                        document.getElementById('aeDigitalFields').style.display =
+                            (asset.type || '').toLowerCase() === 'digital' ? 'block' : 'none';
+                        assetEditFormModal.classList.add('show');
+                    })
+                    .catch(() => alert('Error loading asset for editing'));
+            }
+
+            document.getElementById('aeSaveBtn').addEventListener('click', () => {
+                const assetId = document.getElementById('aeAssetId').value;
+                if (!assetId) return;
+                const payload = {
+                    name:                   document.getElementById('aeAssetName').value.trim(),
+                    description:            document.getElementById('aeAssetDescription').value.trim(),
+                    owner:                  document.getElementById('aeAssetOwner').value.trim(),
+                    location:               document.getElementById('aeAssetLocation').value.trim(),
+                    type:                   document.getElementById('aeAssetType').value,
+                    asset_value:            document.getElementById('aeAssetValue').value || null,
+                    confidentiality_impact: document.getElementById('aeConfidentiality').value,
+                    integrity_impact:       document.getElementById('aeIntegrity').value,
+                    availability_impact:    document.getElementById('aeAvailability').value,
+                    ip_address:             document.getElementById('aeIpAddress').value.trim(),
+                    mac_address:            document.getElementById('aeMacAddress').value.trim()
+                };
+                const saveBtn = document.getElementById('aeSaveBtn');
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                saveBtn.disabled = true;
+                fetch(`${API_BASE_URL}/api/assets/${assetId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) { alert('Error saving: ' + data.error); return; }
+                    closeAssetEditForm();
+                    loadAssets();
+                })
+                .catch(() => alert('Error saving asset'))
+                .finally(() => {
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                    saveBtn.disabled = false;
+                });
+            });
+
+            // ── Delete confirm modal (Red) ──
+            const assetDeleteConfirmOverlay = document.getElementById('assetDeleteConfirmOverlay');
+            document.getElementById('assetDeleteConfirmNo').addEventListener('click', () => {
+                assetDeleteConfirmOverlay.classList.remove('show');
+                pendingDeleteId = null;
+            });
+            document.getElementById('assetDeleteConfirmYes').addEventListener('click', () => {
+                assetDeleteConfirmOverlay.classList.remove('show');
+                if (!pendingDeleteId) return;
+                fetch(`${API_BASE_URL}/api/assets/${pendingDeleteId}`, { method: 'DELETE' })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.error) alert('Error deleting asset: ' + data.error);
+                        else loadAssets();
+                    })
+                    .catch(() => alert('Error deleting asset'))
+                    .finally(() => { pendingDeleteId = null; });
+            });
+            assetDeleteConfirmOverlay.addEventListener('click', e => {
+                if (e.target === assetDeleteConfirmOverlay) {
+                    assetDeleteConfirmOverlay.classList.remove('show');
+                    pendingDeleteId = null;
+                }
+            });
+
+            // ── Legacy editAsset / deleteAsset (kept for Fetch-from-Network discovered assets) ──
+            function editAsset(assetId) {
+                pendingEditId = assetId;
+                document.getElementById('assetEditConfirmOverlay').classList.add('show');
+            }
+            
+            // Delete asset
+            function deleteAsset(assetId) {
+                pendingDeleteId = assetId;
+                document.getElementById('assetDeleteConfirmOverlay').classList.add('show');
+            }
+            
+            // Import CSV functionality
+            let currentStep = 1;
+            let csvData = [];
+            
+            document.getElementById('nextStepBtn').addEventListener('click', function() {
+                if (currentStep === 1) {
+                    // Step 1 to Step 2
+                    document.getElementById('step1').classList.remove('active');
+                    document.getElementById('step1Content').style.display = 'none';
+                    document.getElementById('step2').classList.add('active');
+                    document.getElementById('step2Content').style.display = 'block';
+                    currentStep = 2;
+                    document.getElementById('nextStepBtn').textContent = 'Next';
+                } else if (currentStep === 2) {
+                    // Step 2 to Step 3 (if file is selected)
+                    const fileInput = document.getElementById('csvFileInput');
+                    if (!fileInput.files.length) {
+                        alert('Please select a CSV file first');
+                        return;
+                    }
+                    
+                    parseCSV(fileInput.files[0]);
+                } else if (currentStep === 3) {
+                    // Step 3 - Confirm import
+                    importCSVData();
+                }
+            });
+            
+            // Add event listener for Confirm Import button directly
+            document.getElementById('confirmImportBtn').addEventListener('click', function() {
+                importCSVData();
+            });
+            
+            document.getElementById('downloadTemplateBtn').addEventListener('click', function() {
+                window.open(`${API_BASE_URL}/api/assets/download-template`, '_blank');
+            });
+            
+            document.getElementById('browseFilesBtn').addEventListener('click', function() {
+                document.getElementById('csvFileInput').click();
+            });
+            
+            document.getElementById('csvFileInput').addEventListener('change', function(e) {
+                if (e.target.files.length) {
+                    const file = e.target.files[0];
+                    if (!file.name.endsWith('.csv')) {
+                        alert('Please select a CSV file (.csv extension)');
+                        this.value = ''; // Clear the file input
+                        return;
+                    }
+                    document.getElementById('fileName').textContent = file.name;
+                    document.getElementById('fileInfo').style.display = 'block';
+                }
+            });
+            
+            document.getElementById('fileUploadArea').addEventListener('click', function() {
+                document.getElementById('csvFileInput').click();
+            });
+            
+            // Drag and drop for CSV file
+            document.getElementById('fileUploadArea').addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = 'var(--accent)';
+            });
+            
+            document.getElementById('fileUploadArea').addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#cbd5e1';
+            });
+            
+            document.getElementById('fileUploadArea').addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#cbd5e1';
+                
+                if (e.dataTransfer.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.name.endsWith('.csv')) {
+                        document.getElementById('csvFileInput').files = e.dataTransfer.files;
+                        document.getElementById('fileName').textContent = file.name;
+                        document.getElementById('fileInfo').style.display = 'block';
+                    } else {
+                        alert('Please select a CSV file (.csv extension)');
+                    }
+                }
+            });
+            
+            function parseCSV(file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const text = e.target.result;
+                        const lines = text.split('\n').filter(line => line.trim() !== '');
+                        
+                        if (lines.length === 0) {
+                            alert('CSV file is empty');
+                            return;
+                        }
+                        
+                        const headers = lines[0].split(',').map(h => h.trim());
+                        
+                        // Validate required headers
+                        const requiredHeaders = ['name', 'owner', 'type'];
+                        const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+                        
+                        if (missingHeaders.length > 0) {
+                            alert(`Missing required columns: ${missingHeaders.join(', ')}\nPlease use the template.`);
+                            return;
+                        }
+                        
+                        csvData = [];
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                            // Handle CSV with quoted values containing commas
+                            const values = parseCSVLine(lines[i]);
+                            
+                            if (values.length !== headers.length) {
+                                console.warn(`Row ${i + 1} has ${values.length} columns, expected ${headers.length}. Skipping.`);
+                                continue;
+                            }
+                            
+                            const row = {};
+                            headers.forEach((header, index) => {
+                                row[header] = values[index] ? values[index].trim() : '';
+                            });
+                            
+                            // Validate required fields
+                            if (!row.name || !row.owner || !row.type) {
+                                console.warn(`Row ${i + 1} missing required fields. Skipping.`);
+                                continue;
+                            }
+                            
+                            csvData.push(row);
+                        }
+                        
+                        if (csvData.length === 0) {
+                            alert('No valid data found in CSV file');
+                            return;
+                        }
+                        
+                        // Show preview
+                        showImportPreview();
+                        
+                        // Move to step 3
+                        document.getElementById('step2').classList.remove('active');
+                        document.getElementById('step2').classList.add('completed');
+                        document.getElementById('step2Content').style.display = 'none';
+                        document.getElementById('step3').classList.add('active');
+                        document.getElementById('step3Content').style.display = 'block';
+                        document.getElementById('nextStepBtn').style.display = 'none';
+                        document.getElementById('confirmImportBtn').style.display = 'block';
+                        currentStep = 3;
+                        
+                    } catch (error) {
+                        console.error('Error parsing CSV:', error);
+                        alert('Error parsing CSV file. Please check the format.');
+                    }
+                };
+                
+                reader.onerror = function() {
+                    alert('Error reading file');
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            // Helper function to parse CSV lines with quoted values
+            function parseCSVLine(line) {
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    const nextChar = line[i + 1];
+                    
+                    if (char === '"' && !inQuotes) {
+                        inQuotes = true;
+                    } else if (char === '"' && inQuotes && nextChar === '"') {
+                        current += '"';
+                        i++; // Skip next quote
+                    } else if (char === '"' && inQuotes) {
+                        inQuotes = false;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current);
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                
+                values.push(current); // Add last value
+                return values;
+            }
+            
+            function showImportPreview() {
+                const tbody = document.getElementById('importPreviewBody');
+                tbody.innerHTML = '';
+                
+                // Show first 5 rows or all if less than 5
+                const previewRows = csvData.slice(0, 5);
+                
+                previewRows.forEach((row, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.name || ''}</td>
+                        <td>${row.type || ''}</td>
+                        <td>${row.owner || ''}</td>
+                        <td>${row.location || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+                // If there are more rows, show a summary
+                if (csvData.length > 5) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td colspan="4" style="text-align: center; font-style: italic;">
+                            ... and ${csvData.length - 5} more rows
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+                
+                document.getElementById('importCount').textContent = csvData.length;
+            }
+            
+            function importCSVData() {
+                const fileInput = document.getElementById('csvFileInput');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    alert('No file selected');
+                    return;
+                }
+                
+                // Show loading state
+                const confirmBtn = document.getElementById('confirmImportBtn');
+                const originalText = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+                confirmBtn.disabled = true;
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                fetch(`${API_BASE_URL}/api/assets/import`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        alert('Error importing: ' + data.error);
+                    } else {
+                        let message = data.message || 'Import completed successfully';
+                        
+                        // Show detailed import results if available
+                        if (data.imported_count !== undefined) {
+                            message += `\nImported: ${data.imported_count} assets`;
+                            if (data.errors && data.errors.length > 0) {
+                                message += `\nErrors: ${data.errors.length}`;
+                                // Optionally show errors in console or separate alert
+                                console.warn('Import errors:', data.errors);
+                            }
+                        }
+                        
+                        alert(message);
+                        importModal.classList.remove('show');
+                        resetImportModal();
+                        loadAssets(); // Refresh the asset list
+                    }
+                })
+                .catch(error => {
+                    console.error('Error importing:', error);
+                    alert('Error importing assets. Please check console for details.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    confirmBtn.innerHTML = originalText;
+                    confirmBtn.disabled = false;
+                });
+            }
+            
+            function resetImportModal() {
+                currentStep = 1;
+                csvData = [];
+                
+                // Reset steps
+                document.getElementById('step1').classList.add('active');
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step2').classList.remove('completed');
+                document.getElementById('step3').classList.remove('active');
+                
+                // Reset content visibility
+                document.getElementById('step1Content').style.display = 'block';
+                document.getElementById('step2Content').style.display = 'none';
+                document.getElementById('step3Content').style.display = 'none';
+                
+                // Reset buttons
+                document.getElementById('nextStepBtn').style.display = 'block';
+                document.getElementById('nextStepBtn').textContent = 'Next';
+                document.getElementById('confirmImportBtn').style.display = 'none';
+                
+                // Reset file input
+                document.getElementById('csvFileInput').value = '';
+                document.getElementById('fileInfo').style.display = 'none';
+                document.getElementById('importPreviewBody').innerHTML = '';
+                document.getElementById('importCount').textContent = '0';
+            }
+            
+            // Filter functionality
+            const typeFilter = document.getElementById('typeFilter');
+            const searchInput = document.querySelector('.search-input');
+            
+            function applyFilters() {
+                const typeValue = typeFilter.value;
+                const searchValue = searchInput.value.toLowerCase();
+                
+                const rows = document.querySelectorAll('#assetsTableBody tr');
+                let visibleCount = 0;
+                
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length < 6) return;
+                    
+                    const typeText = cells[2].querySelector('span').textContent;
+                    const rowText = row.textContent.toLowerCase();
+                    
+                    let visible = true;
+                    
+                    // Apply type filter
+                    if (typeValue !== 'all' && typeText !== typeValue) {
+                        visible = false;
+                    }
+                    
+                    // Apply search filter
+                    if (searchValue && !rowText.includes(searchValue)) {
+                        visible = false;
+                    }
+                    
+                    if (visible) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                
+                document.getElementById('tableSummary').textContent = `${visibleCount} assets`;
+            }
+            
+            typeFilter.addEventListener('change', applyFilters);
+            searchInput.addEventListener('input', applyFilters);
+            
+            // Fetch Assets from Network functionality
+            const subnetInventoryTableBody = document.getElementById('subnetInventoryTableBody');
+            const addSubnetBtn = document.getElementById('addSubnetBtn');
+            const subnetFormContainer = document.getElementById('subnetFormContainer');
+            const subnetFormTitle = document.getElementById('subnetFormTitle');
+            const subnetFormName = document.getElementById('subnetFormName');
+            const subnetFormCidr = document.getElementById('subnetFormCidr');
+            const subnetFormCriticality = document.getElementById('subnetFormCriticality');
+            const cancelSubnetFormBtn = document.getElementById('cancelSubnetFormBtn');
+            const saveSubnetFormBtn = document.getElementById('saveSubnetFormBtn');
+            const selectedSubnetBanner = document.getElementById('selectedSubnetBanner');
+            const selectedSubnetBannerText = document.getElementById('selectedSubnetBannerText');
+            const knownIps = document.getElementById('knownIps');
+            const nextFetchStepBtn = document.getElementById('nextFetchStepBtn');
+            const prevStepBtn = document.getElementById('prevStepBtn');
+            const saveDiscoveredAssetsBtn = document.getElementById('saveDiscoveredAssetsBtn');
+            const scanOutput = document.getElementById('scanOutput');
+            const scanProgressBar = document.getElementById('scanProgressBar');
+            const scanProgressText = document.getElementById('scanProgressText');
+            const scanStatus = document.getElementById('scanStatus');
+            const discoveredAssetsTable = document.getElementById('discoveredAssetsTable');
+            const discoveredAssetCount = document.getElementById('discoveredAssetCount');
+            const selectedAssetCount = document.getElementById('selectedAssetCount');
+            const selectAllAssets = document.getElementById('selectAllAssets');
+            const selectedSubnetDisplay = document.getElementById('selectedSubnetDisplay');
+
+            let fetchCurrentStep = 1;
+            let discoveredAssets = [];
+            let scanSessionId = null;
+            let selectedSubnet = '';
+            let selectedSubnetId = null;
+            let subnetInventoryCache = [];
+            let subnetFormMode = 'add'; // 'add' or 'edit'
+            let subnetFormEditingId = null;
+
+            // Load subnets from database into the inventory table
+            function loadSubnets() {
+                subnetInventoryTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 1rem; color: #64748b;">Loading subnets...</td></tr>';
+                fetch(`${API_BASE_URL}/api/subnets`)
+                    .then(response => response.json())
+                    .then(subnets => {
+                        if (subnets && subnets.error) {
+                            subnetInventoryTableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 1rem; color: var(--danger);">Error loading subnets: ${subnets.error}</td></tr>`;
+                            subnetInventoryCache = [];
+                            return;
+                        }
+                        subnetInventoryCache = Array.isArray(subnets) ? subnets : [];
+                        renderSubnetInventory();
+                    })
+                    .catch(error => {
+                        console.error('Error loading subnets:', error);
+                        subnetInventoryTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 1rem; color: var(--danger);">Error loading subnets</td></tr>';
+                        subnetInventoryCache = [];
+                    });
+            }
+
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function criticalityClass(level) {
+                const map = {
+                    'Critical': 'critical',
+                    'V.High': 'v-high',
+                    'High': 'high',
+                    'Medium': 'medium',
+                    'Low': 'low'
+                };
+                return map[level] || 'medium';
+            }
+
+            function renderSubnetInventory() {
+                if (!subnetInventoryCache.length) {
+                    subnetInventoryTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 1rem; color: #64748b;">No subnets found. Click "Add Subnet" to create one.</td></tr>';
+                    updateSelectedSubnetBanner();
+                    return;
+                }
+
+                subnetInventoryTableBody.innerHTML = '';
+                subnetInventoryCache.forEach(subnet => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.subnetId = subnet.subnet_id;
+                    tr.dataset.subnetCidr = subnet.subnet_cidr;
+                    if (selectedSubnetId === subnet.subnet_id) {
+                        tr.classList.add('selected-subnet-row');
+                    }
+                    const isChecked = selectedSubnetId === subnet.subnet_id ? 'checked' : '';
+                    tr.innerHTML = `
+                        <td><input type="radio" name="subnetInventoryRadio" class="subnet-row-radio" ${isChecked}></td>
+                        <td>${escapeHtml(subnet.subnet_name)}</td>
+                        <td><code style="font-family: 'Courier New', monospace;">${escapeHtml(subnet.subnet_cidr)}</code></td>
+                        <td><span class="criticality-level ${criticalityClass(subnet.impact_level)}">${escapeHtml(subnet.impact_level)}</span></td>
+                        <td>
+                            <div class="action-buttons-cell">
+                                <button type="button" class="action-btn edit-btn" title="Edit" data-subnet-id="${subnet.subnet_id}" data-action="edit" style="border: none; background: none; cursor: pointer; padding: 0;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="action-btn delete-btn" title="Delete" data-subnet-id="${subnet.subnet_id}" data-action="delete" style="border: none; background: none; cursor: pointer; padding: 0;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+
+                    // Row click selects this subnet
+                    tr.addEventListener('click', function(e) {
+                        // ignore clicks on action buttons themselves
+                        if (e.target.closest('[data-action]')) return;
+                        selectSubnetRow(subnet);
+                    });
+
+                    // Edit button
+                    const editBtn = tr.querySelector('[data-action="edit"]');
+                    if (editBtn) {
+                        editBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('✓ Subnet edit clicked:', subnet.subnet_name);
+                            pendingSubnetEdit = subnet;
+                            const modal = document.getElementById('subnetEditConfirmOverlay');
+                            if (modal) {
+                                modal.classList.add('show');
+                            }
+                        });
+                    }
+
+                    // Delete button
+                    const deleteBtn = tr.querySelector('[data-action="delete"]');
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('✓ Subnet delete clicked:', subnet.subnet_name);
+                            pendingSubnetDelete = subnet;
+                            const subtitleEl = document.getElementById('subnetDeleteSubtitle');
+                            if (subtitleEl) {
+                                subtitleEl.textContent =
+                                    `Are you sure you want to delete "${subnet.subnet_name}" (${subnet.subnet_cidr})? This will remove it from the inventory.`;
+                            }
+                            const modal = document.getElementById('subnetDeleteConfirmOverlay');
+                            if (modal) {
+                                modal.classList.add('show');
+                            }
+                        });
+                    }
+
+                    subnetInventoryTableBody.appendChild(tr);
+                });
+
+                updateSelectedSubnetBanner();
+            }
+
+            function selectSubnetRow(subnet) {
+                selectedSubnetId = subnet.subnet_id;
+                selectedSubnet = subnet.subnet_cidr;
+                // Update selected styling on rows + radios
+                subnetInventoryTableBody.querySelectorAll('tr').forEach(tr => {
+                    if (tr.dataset.subnetId === subnet.subnet_id) {
+                        tr.classList.add('selected-subnet-row');
+                        const r = tr.querySelector('.subnet-row-radio');
+                        if (r) r.checked = true;
+                    } else {
+                        tr.classList.remove('selected-subnet-row');
+                        const r = tr.querySelector('.subnet-row-radio');
+                        if (r) r.checked = false;
+                    }
+                });
+                updateSelectedSubnetBanner();
+            }
+
+            function updateSelectedSubnetBanner() {
+                if (selectedSubnetId && selectedSubnet) {
+                    const sn = subnetInventoryCache.find(s => s.subnet_id === selectedSubnetId);
+                    selectedSubnetBannerText.textContent = sn
+                        ? `${sn.subnet_name} (${sn.subnet_cidr}) — ${sn.impact_level}`
+                        : selectedSubnet;
+                    selectedSubnetBanner.style.display = 'block';
+                } else {
+                    selectedSubnetBanner.style.display = 'none';
+                }
+            }
+
+            // Add/Edit subnet form
+            function openSubnetFormForAdd() {
+                subnetFormMode = 'add';
+                subnetFormEditingId = null;
+                subnetFormTitle.textContent = 'Add New Subnet';
+                subnetFormName.value = '';
+                subnetFormCidr.value = '';
+                subnetFormCriticality.value = '';
+                subnetFormContainer.style.display = 'block';
+                subnetFormName.focus();
+            }
+
+            function openSubnetFormForEdit(subnet) {
+                subnetFormMode = 'edit';
+                subnetFormEditingId = subnet.subnet_id;
+                subnetFormTitle.textContent = `Edit Subnet — ${subnet.subnet_id}`;
+                subnetFormName.value = subnet.subnet_name || '';
+                subnetFormCidr.value = subnet.subnet_cidr || '';
+                subnetFormCriticality.value = subnet.impact_level || '';
+                subnetFormContainer.style.display = 'block';
+                subnetFormName.focus();
+            }
+
+            function closeSubnetForm() {
+                subnetFormContainer.style.display = 'none';
+                subnetFormMode = 'add';
+                subnetFormEditingId = null;
+            }
+
+            addSubnetBtn.addEventListener('click', openSubnetFormForAdd);
+            cancelSubnetFormBtn.addEventListener('click', closeSubnetForm);
+
+            saveSubnetFormBtn.addEventListener('click', function() {
+                const name = subnetFormName.value.trim();
+                const cidr = subnetFormCidr.value.trim();
+                const criticality = subnetFormCriticality.value;
+
+                if (!name) { alert('Please enter a subnet name.'); return; }
+                if (!cidr) { alert('Please enter a subnet CIDR.'); return; }
+                if (!isValidSubnet(cidr)) { alert('Please enter a valid subnet in CIDR notation (e.g., 192.168.100.0/24)'); return; }
+                if (!criticality) { alert('Please select a criticality.'); return; }
+
+                const payload = { subnet_name: name, subnet_cidr: cidr, impact_level: criticality };
+                const isEdit = subnetFormMode === 'edit' && subnetFormEditingId;
+                const url = isEdit
+                    ? `${API_BASE_URL}/api/subnets/${encodeURIComponent(subnetFormEditingId)}`
+                    : `${API_BASE_URL}/api/subnets`;
+                const method = isEdit ? 'PUT' : 'POST';
+
+                saveSubnetFormBtn.disabled = true;
+                const originalHtml = saveSubnetFormBtn.innerHTML;
+                saveSubnetFormBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                    .then(({ ok, data }) => {
+                        if (!ok || data.error) {
+                            alert(`Failed to save subnet: ${data.error || 'Unknown error'}`);
+                            return;
+                        }
+                        closeSubnetForm();
+                        // If we just edited the currently selected subnet, refresh selectedSubnet CIDR
+                        if (isEdit && selectedSubnetId === subnetFormEditingId) {
+                            selectedSubnet = cidr;
+                        }
+                        loadSubnets();
+                    })
+                    .catch(err => {
+                        console.error('Save subnet error:', err);
+                        alert('Failed to save subnet. Please try again.');
+                    })
+                    .finally(() => {
+                        saveSubnetFormBtn.disabled = false;
+                        saveSubnetFormBtn.innerHTML = originalHtml;
+                    });
+            });
+
+            // ── Subnet confirm modal state ──
+            let pendingSubnetEdit   = null;
+            let pendingSubnetDelete = null;
+
+            // Subnet Edit confirm (Green)
+            const subnetEditConfirmOverlay = document.getElementById('subnetEditConfirmOverlay');
+            document.getElementById('subnetEditConfirmNo').addEventListener('click', () => {
+                subnetEditConfirmOverlay.classList.remove('show');
+                pendingSubnetEdit = null;
+            });
+            document.getElementById('subnetEditConfirmYes').addEventListener('click', () => {
+                subnetEditConfirmOverlay.classList.remove('show');
+                if (pendingSubnetEdit) { openSubnetFormForEdit(pendingSubnetEdit); pendingSubnetEdit = null; }
+            });
+            subnetEditConfirmOverlay.addEventListener('click', e => {
+                if (e.target === subnetEditConfirmOverlay) { subnetEditConfirmOverlay.classList.remove('show'); pendingSubnetEdit = null; }
+            });
+
+            // Subnet Delete confirm (Red)
+            const subnetDeleteConfirmOverlay = document.getElementById('subnetDeleteConfirmOverlay');
+            document.getElementById('subnetDeleteConfirmNo').addEventListener('click', () => {
+                subnetDeleteConfirmOverlay.classList.remove('show');
+                pendingSubnetDelete = null;
+            });
+            document.getElementById('subnetDeleteConfirmYes').addEventListener('click', () => {
+                subnetDeleteConfirmOverlay.classList.remove('show');
+                if (pendingSubnetDelete) { deleteSubnet(pendingSubnetDelete); pendingSubnetDelete = null; }
+            });
+            subnetDeleteConfirmOverlay.addEventListener('click', e => {
+                if (e.target === subnetDeleteConfirmOverlay) { subnetDeleteConfirmOverlay.classList.remove('show'); pendingSubnetDelete = null; }
+            });
+
+            function deleteSubnet(subnet) {
+                fetch(`${API_BASE_URL}/api/subnets/${encodeURIComponent(subnet.subnet_id)}`, {
+                    method: 'DELETE'
+                })
+                    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+                    .then(({ ok, data }) => {
+                        if (!ok || data.error) {
+                            alert(`Failed to delete subnet: ${data.error || 'Unknown error'}`);
+                            return;
+                        }
+                        if (selectedSubnetId === subnet.subnet_id) {
+                            selectedSubnetId = null;
+                            selectedSubnet = '';
+                        }
+                        loadSubnets();
+                    })
+                    .catch(err => {
+                        console.error('Delete subnet error:', err);
+                        alert('Failed to delete subnet. Please try again.');
+                    });
+            }
+
+            // Next / Scan-Now / Previous step navigation
+            nextFetchStepBtn.addEventListener('click', function() {
+                if (fetchCurrentStep === 1) {
+                    // Validate step 1: must have a selected subnet
+                    if (!selectedSubnetId || !selectedSubnet) {
+                        alert('Please select a subnet from the inventory by clicking a row.');
+                        return;
+                    }
+                    if (!isValidSubnet(selectedSubnet)) {
+                        alert('Selected subnet is not in valid CIDR notation. Please edit it.');
+                        return;
+                    }
+                    // Update display + move to step 2 + immediately start scan
+                    selectedSubnetDisplay.textContent = selectedSubnet;
+                    updateFetchStep(2);
+                    startNetworkScan();
+                } else if (fetchCurrentStep === 2) {
+                    // Step 2 button label is also "Scan Now" if user came back; restart scan
+                    startNetworkScan();
+                }
+            });
+            
+            prevStepBtn.addEventListener('click', function() {
+                if (fetchCurrentStep === 2) {
+                    updateFetchStep(1);
+                } else if (fetchCurrentStep === 3) {
+                    updateFetchStep(2);
+                }
+            });
+            
+            function updateFetchStep(step) {
+                // Hide all step contents
+                document.getElementById('fetchStep1Content').style.display = 'none';
+                document.getElementById('fetchStep2Content').style.display = 'none';
+                document.getElementById('fetchStep3Content').style.display = 'none';
+                
+                // Update step indicators
+                document.getElementById('fetchStep1').classList.remove('active');
+                document.getElementById('fetchStep2').classList.remove('active');
+                document.getElementById('fetchStep3').classList.remove('active');
+                
+                // Update step to active
+                document.getElementById(`fetchStep${step}`).classList.add('active');
+                document.getElementById(`fetchStep${step}Content`).style.display = 'block';
+                
+                // Update buttons
+                if (step === 1) {
+                    prevStepBtn.style.display = 'none';
+                    nextFetchStepBtn.style.display = 'block';
+                    nextFetchStepBtn.innerHTML = '<i class="fas fa-search"></i> Scan Now';
+                    saveDiscoveredAssetsBtn.style.display = 'none';
+                } else if (step === 2) {
+                    prevStepBtn.style.display = 'block';
+                    nextFetchStepBtn.style.display = 'block';
+                    nextFetchStepBtn.innerHTML = '<i class="fas fa-redo"></i> Re-scan';
+                    saveDiscoveredAssetsBtn.style.display = 'none';
+                } else if (step === 3) {
+                    prevStepBtn.style.display = 'block';
+                    nextFetchStepBtn.style.display = 'none';
+                    saveDiscoveredAssetsBtn.style.display = 'block';
+                }
+                
+                fetchCurrentStep = step;
+            }
+            
+            function isValidSubnet(subnet) {
+                try {
+                    const [ip, mask] = subnet.split('/');
+                    if (!ip || !mask) return false;
+                    
+                    const maskNum = parseInt(mask, 10);
+                    if (maskNum < 0 || maskNum > 32) return false;
+                    
+                    // Basic IP validation
+                    const parts = ip.split('.');
+                    if (parts.length !== 4) return false;
+                    
+                    return parts.every(part => {
+                        const num = parseInt(part, 10);
+                        return num >= 0 && num <= 255;
+                    });
+                } catch {
+                    return false;
+                }
+            }
+            
+            function startNetworkScan() {
+                const knownIpsArray = knownIps.value.split('\n')
+                    .map(ip => ip.trim())
+                    .filter(ip => ip.length > 0);
+                
+                // Disable next button and show loading
+                nextFetchStepBtn.disabled = true;
+                nextFetchStepBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning...';
+                
+                // Clear previous scan output
+                scanOutput.innerHTML = `
+<pre style="margin: 0; color: #94a3b8;">
+==================================================
+Host Discovery - Multi-Method Scanner
+==================================================
+
+Starting scan on ${selectedSubnet}...
+</pre>
+                `;
+                
+                // Reset progress bar
+                scanProgressBar.style.width = '0%';
+                scanProgressText.textContent = '0%';
+                scanStatus.textContent = 'Initializing scan...';
+                
+                // Start the scan
+                fetch(`${API_BASE_URL}/api/scan-network`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        subnet: selectedSubnet,
+                        known_ips: knownIpsArray
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    scanSessionId = data.session_id;
+                    
+                    // Start polling for scan results
+                    pollScanResults();
+                })
+                .catch(error => {
+                    console.error('Error starting scan:', error);
+                    scanOutput.innerHTML += `<pre style="color: #e53e3e;">\nError: ${error.message}</pre>`;
+                    scanStatus.textContent = 'Scan failed';
+                    nextFetchStepBtn.disabled = false;
+                    nextFetchStepBtn.innerHTML = '<i class="fas fa-redo"></i> Re-scan';
+                });
+            }
+            
+            function pollScanResults() {
+                if (!scanSessionId) return;
+                
+                const pollInterval = setInterval(() => {
+                    fetch(`${API_BASE_URL}/api/scan-network/${scanSessionId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'completed') {
+                                clearInterval(pollInterval);
+                                onScanComplete(data);
+                            } else if (data.status === 'running') {
+                                updateScanProgress(data);
+                            } else if (data.status === 'failed') {
+                                clearInterval(pollInterval);
+                                onScanFailed(data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error polling scan results:', error);
+                            clearInterval(pollInterval);
+                        });
+                }, 2000); // Poll every 2 seconds
+            }
+            
+            function updateScanProgress(data) {
+                // Update progress bar
+                if (data.progress !== undefined) {
+                    const progress = Math.min(100, Math.max(0, data.progress));
+                    scanProgressBar.style.width = `${progress}%`;
+                    scanProgressText.textContent = `${progress}%`;
+                }
+                
+                // Update status
+                if (data.status_message) {
+                    scanStatus.textContent = data.status_message;
+                }
+                
+                // Update output
+                if (data.output) {
+                    scanOutput.innerHTML = `<pre style="margin: 0; color: #cbd5e1;">${data.output}</pre>`;
+                    scanOutput.scrollTop = scanOutput.scrollHeight;
+                }
+            }
+            
+            function onScanComplete(data) {
+                scanProgressBar.style.width = '100%';
+                scanProgressText.textContent = '100%';
+                scanStatus.textContent = 'Scan completed';
+
+                // Update output with final results
+                if (data.output) {
+                    scanOutput.innerHTML = `<pre style="margin: 0; color: #cbd5e1;">${data.output}</pre>`;
+                    scanOutput.scrollTop = scanOutput.scrollHeight;
+                }
+
+                const liveDevices = (data.devices && Array.isArray(data.devices)) ? data.devices : [];
+
+                // Always fetch DB assets for the selected subnet and merge with live results
+                fetch(`${API_BASE_URL}/api/assets/by-subnet?subnet=${encodeURIComponent(selectedSubnet)}`)
+                    .then(r => r.json())
+                    .then(dbData => {
+                        const dbAssets = (dbData.assets && Array.isArray(dbData.assets)) ? dbData.assets : [];
+
+                        // Build a set of live IPs to detect duplicates
+                        const liveIpSet = new Set(liveDevices.map(d => d.ip));
+
+                        // DB-only: assets in DB not found by live scan
+                        const dbOnly = dbAssets.filter(a => !liveIpSet.has(a.ip) && a.ip !== 'N/A');
+
+                        // Combine and mark each entry appropriately
+                        const allDevices = [
+                            ...liveDevices.map(d => {
+                                const dbMatch = dbAssets.find(a => a.ip === d.ip);
+                                return { ...d, in_database: !!dbMatch, asset_id: dbMatch ? dbMatch.asset_id : null };
+                            }),
+                            ...dbOnly
+                        ];
+
+                        discoveredAssets = allDevices.map(device => ({ ...device, selected: true }));
+
+                        if (discoveredAssets.length > 0) {
+                            updateFetchStep(3);
+                            displayDiscoveredAssets();
+                            const msg = `
+✓ ${liveDevices.length} live device(s) + ${dbOnly.length} database asset(s) = ${discoveredAssets.length} total found`;
+                            scanOutput.innerHTML += `<pre style="margin:0;color:#4ade80;">${msg}</pre>`;
+                        } else {
+                            const msg = `
+No assets found via live scan or database for subnet ${selectedSubnet}.`;
+                            scanOutput.innerHTML += `<pre style="margin:0;color:#f87171;">${msg}</pre>`;
+                        }
+                    })
+                    .catch(err => {
+                        console.error('DB asset fetch error:', err);
+                        // Fallback: use live results only
+                        discoveredAssets = liveDevices.map(d => ({ ...d, selected: true }));
+                        if (discoveredAssets.length > 0) {
+                            updateFetchStep(3);
+                            displayDiscoveredAssets();
+                        }
+                    })
+                    .finally(() => {
+                        nextFetchStepBtn.disabled = false;
+                        nextFetchStepBtn.innerHTML = '<i class="fas fa-redo"></i> Re-scan';
+                    });
+            }
+            
+            function onScanFailed(error) {
+                scanProgressBar.style.width = '0%';
+                scanProgressText.textContent = '0%';
+                scanStatus.textContent = 'Scan failed';
+                
+                scanOutput.innerHTML += `<pre style="color: #e53e3e;">\nScan failed: ${error}</pre>`;
+                scanOutput.scrollTop = scanOutput.scrollHeight;
+                
+                nextFetchStepBtn.disabled = false;
+                nextFetchStepBtn.innerHTML = '<i class="fas fa-redo"></i> Re-scan';
+            }
+            
+            function displayDiscoveredAssets() {
+                discoveredAssetsTable.innerHTML = '';
+                
+                if (discoveredAssets.length === 0) {
+                    discoveredAssetsTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                                No assets discovered
+                            </td>
+                        </tr>
+                    `;
+                    discoveredAssetCount.textContent = '0';
+                    selectedAssetCount.textContent = '0';
+                    return;
+                }
+                
+                discoveredAssets.forEach((asset, index) => {
+                    const row = document.createElement('tr');
+                    const isDbAsset = asset.in_database || asset.method === 'Database';
+                    const methodLabel = isDbAsset
+                        ? `<span style="background:#2563eb;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75rem;">DB</span> ${asset.method || 'Database'}`
+                        : (asset.method || 'Unknown');
+                    const ipLabel = isDbAsset && asset.asset_id
+                        ? `${asset.ip} <small style="color:#64748b;">[#${asset.asset_id}]</small>`
+                        : asset.ip;
+                    row.innerHTML = `
+                        <td>
+                            <input type="checkbox" class="asset-checkbox" data-index="${index}" ${asset.selected ? 'checked' : ''}>
+                        </td>
+                        <td>${ipLabel}</td>
+                        <td>${asset.hostname || 'N/A'}</td>
+                        <td>${asset.mac_address || 'N/A'}</td>
+                        <td>${methodLabel}</td>
+                    `;
+                    discoveredAssetsTable.appendChild(row);
+                });
+                
+                updateSelectedCount();
+                discoveredAssetCount.textContent = discoveredAssets.length;
+                
+                // Add event listeners to checkboxes
+                document.querySelectorAll('.asset-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        discoveredAssets[index].selected = this.checked;
+                        updateSelectedCount();
+                    });
+                });
+                
+                selectAllAssets.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    discoveredAssets.forEach(asset => {
+                        asset.selected = isChecked;
+                    });
+                    
+                    document.querySelectorAll('.asset-checkbox').forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    
+                    updateSelectedCount();
+                });
+            }
+            
+            function updateSelectedCount() {
+                const selectedCount = discoveredAssets.filter(asset => asset.selected).length;
+                selectedAssetCount.textContent = selectedCount;
+            }
+            
+            // Save discovered assets
+            saveDiscoveredAssetsBtn.addEventListener('click', function() {
+                const selectedAssets = discoveredAssets.filter(asset => asset.selected);
+                
+                if (selectedAssets.length === 0) {
+                    alert('Please select at least one asset to save');
+                    return;
+                }
+                
+                // Default configuration
+                const defaultOwner = "Network Team";
+                const defaultType = "Digital";
+                const defaultLocation = selectedSubnet;
+                
+                // Prepare assets for saving
+                const assetsToSave = selectedAssets.map(asset => ({
+                    name: asset.hostname !== 'N/A' ? asset.hostname : `Network Device ${asset.ip}`,
+                    description: `Discovered via network scan (${asset.method})`,
+                    owner: defaultOwner,
+                    location: defaultLocation,
+                    type: defaultType,
+                    ip_address: asset.ip,
+                    mac_address: asset.mac_address || '',
+                    confidentiality_impact: '3',
+                    integrity_impact: '3',
+                    availability_impact: '3',
+                    asset_value: null
+                }));
+                
+                // Show loading state
+                saveDiscoveredAssetsBtn.disabled = true;
+                saveDiscoveredAssetsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                // Save assets
+                fetch(`${API_BASE_URL}/api/assets/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ assets: assetsToSave })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Error saving assets: ' + data.error);
+                    } else {
+                        alert(`Successfully saved ${data.saved_count || 0} assets`);
+                        fetchNetworkModal.classList.remove('show');
+                        resetFetchNetworkModal();
+                        loadAssets(); // Refresh the asset list
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving assets:', error);
+                    alert('Error saving assets');
+                })
+                .finally(() => {
+                    saveDiscoveredAssetsBtn.disabled = false;
+                    saveDiscoveredAssetsBtn.innerHTML = '<i class="fas fa-save"></i> Save Assets';
+                });
+            });
+            
+            function resetFetchNetworkModal() {
+                fetchCurrentStep = 1;
+                discoveredAssets = [];
+                scanSessionId = null;
+                selectedSubnet = '';
+                selectedSubnetId = null;
+
+                // Reset step indicators
+                document.getElementById('fetchStep1').classList.add('active');
+                document.getElementById('fetchStep2').classList.remove('active');
+                document.getElementById('fetchStep3').classList.remove('active');
+
+                // Show step 1 content
+                document.getElementById('fetchStep1Content').style.display = 'block';
+                document.getElementById('fetchStep2Content').style.display = 'none';
+                document.getElementById('fetchStep3Content').style.display = 'none';
+
+                // Reset buttons
+                prevStepBtn.style.display = 'none';
+                nextFetchStepBtn.style.display = 'block';
+                nextFetchStepBtn.disabled = false;
+                nextFetchStepBtn.innerHTML = '<i class="fas fa-search"></i> Scan Now';
+                saveDiscoveredAssetsBtn.style.display = 'none';
+
+                // Reset form fields
+                if (subnetFormContainer) subnetFormContainer.style.display = 'none';
+                subnetFormName.value = '';
+                subnetFormCidr.value = '';
+                subnetFormCriticality.value = '';
+                subnetFormMode = 'add';
+                subnetFormEditingId = null;
+                knownIps.value = '';
+                selectedSubnetDisplay.textContent = 'N/A';
+                selectedSubnetBanner.style.display = 'none';
+                selectedSubnetBannerText.textContent = '';
+
+                // Re-render inventory rows to clear any selection highlight
+                renderSubnetInventory();
+
+                // Reset scan display
+                scanProgressBar.style.width = '0%';
+                scanProgressText.textContent = '0%';
+                scanStatus.textContent = 'Ready to scan';
+                scanOutput.innerHTML = `
+<pre style="margin: 0; color: #94a3b8;">
+==================================================
+Host Discovery - Multi-Method Scanner
+==================================================
+
+Waiting for scan to begin...
+</pre>
+                `;
+
+                // Clear discovered assets table
+                discoveredAssetsTable.innerHTML = '';
+                discoveredAssetCount.textContent = '0';
+                selectedAssetCount.textContent = '0';
+                selectAllAssets.checked = true;
+            }
+        });
+    </script>
+</body>
+</html>
